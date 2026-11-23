@@ -1,10 +1,20 @@
 package com.gamehub.application;
-import com.gamehub.domain.*; import com.gamehub.infrastructure.Database; import java.nio.charset.StandardCharsets; import java.security.*; import javax.crypto.SecretKeyFactory; import java.sql.*; import java.util.*;
+import com.gamehub.domain.*;
+import com.gamehub.infrastructure.Database;
+import java.security.*;
+import javax.crypto.SecretKeyFactory;
+import java.sql.*;
+import java.util.Base64;
 public final class UserService {
- private final Database db; public UserService(Database db){this.db=db;}
- public void bootstrap(String username,String password) throws Exception { if(username.isBlank()||password.length()<8) throw new IllegalArgumentException("Username and password (8+ characters) are required"); try(PreparedStatement q=db.connection().prepareStatement("SELECT COUNT(*) FROM users"); ResultSet r=q.executeQuery()){if(r.next()&&r.getInt(1)>0) throw new IllegalStateException("Manager already configured");} try(PreparedStatement p=db.connection().prepareStatement("INSERT INTO users(username,password_hash,role,created_at) VALUES(?,?,?,?)")){p.setString(1,username);p.setString(2,hash(password)); p.setString(3,"MANAGER"); p.setString(4,java.time.Instant.now().toString()); p.executeUpdate();}\n }\n public User authenticate(String username,String password) throws SQLException { try(PreparedStatement p=db.connection().prepareStatement("SELECT id,username,role,password_hash FROM users WHERE username=?")){p.setString(1,username);try(ResultSet r=p.executeQuery()){if(!r.next()||!verify(password,r.getString(4)))return null;return new User(r.getLong(1),r.getString(2),Role.valueOf(r.getString(3)));}} }
+ private final Database db;
+ public UserService(Database db){this.db=db;}
+ public void bootstrap(String username,String password)throws Exception{
+  if(username.isBlank()||password.length()<8) throw new IllegalArgumentException("Username and password (8+ characters) are required");
+  try(PreparedStatement q=db.connection().prepareStatement("SELECT COUNT(*) FROM users");ResultSet r=q.executeQuery()){if(r.next()&&r.getInt(1)>0)throw new IllegalStateException("Manager already configured");}
+  try(PreparedStatement p=db.connection().prepareStatement("INSERT INTO users(username,password_hash,role,created_at) VALUES(?,?,?,?)")){p.setString(1,username);p.setString(2,hash(password));p.setString(3,"MANAGER");p.setString(4,java.time.Instant.now().toString());p.executeUpdate();}
+ }
+ public User authenticate(String username,String password)throws SQLException{try(PreparedStatement p=db.connection().prepareStatement("SELECT id,username,role,password_hash FROM users WHERE username=?")){p.setString(1,username);try(ResultSet r=p.executeQuery()){if(!r.next()||!verify(password,r.getString(4)))return null;return new User(r.getLong(1),r.getString(2),Role.valueOf(r.getString(3)));}}}
  private static String hash(String s)throws Exception{byte[] salt=new byte[16];new SecureRandom().nextBytes(salt);return Base64.getEncoder().encodeToString(salt)+":"+Base64.getEncoder().encodeToString(pbkdf(s,salt));}
  private static boolean verify(String s,String stored){try{String[] x=stored.split(":");return MessageDigest.isEqual(pbkdf(s,Base64.getDecoder().decode(x[0])),Base64.getDecoder().decode(x[1]));}catch(Exception e){return false;}}
  private static byte[] pbkdf(String s,byte[] salt)throws Exception{return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(new javax.crypto.spec.PBEKeySpec(s.toCharArray(),salt,120000,256)).getEncoded();}
 }
-
