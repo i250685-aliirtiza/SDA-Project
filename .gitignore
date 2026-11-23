@@ -1,0 +1,8 @@
+*.class
+*.db
+*.db-shm
+*.db-wal
+target/
+.idea/
+.vscode/
+*.iml
