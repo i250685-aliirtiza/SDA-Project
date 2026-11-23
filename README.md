@@ -13,3 +13,9 @@ The database is created at `%USERPROFILE%/.gamehub/gamehub.db` (or `$HOME/.gameh
 
 ## Scope
 The implementation follows `implementation.md`, uses JavaFX 21, SQLite JDBC, prepared statements, transactions, and role-aware application services. Payment is cash/manual external confirmation only; no live gateway is implied.
+
+## Environment setup record
+
+On Windows 11 (build 26300), Git was already installed. JDK 21.0.13.1 and Maven 3.9.11 were downloaded into the user-writable directory `C:\Users\Dell\AppData\Local\GameHubTools` because system-wide installation was not available without elevation. Maven Wrapper files are included in this repository.
+
+Verified with the provisioned toolchain: `mvnw.cmd test` passes. `mvnw.cmd clean verify` compiles and packages successfully. JavaFX launch was invoked; the first invocation was still resolving plugin dependencies when the interactive process was stopped, so a visible window has not been verified in this session.
