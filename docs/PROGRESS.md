@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
 Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T20
-Next exact action: validate round-robin result handling, standings and duplicate match results
+Current task: T22
+Next exact action: enforce maintenance ticket state transitions and station readiness guards
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -27,7 +27,7 @@ Next exact action: validate round-robin result handling, standings and duplicate
 | T17 | PASS | ./mvnw.cmd test PASS (12/12); approved formats enforced and management UI uses ComboBox | 23c7fb6 |
 | T18 | PASS | ./mvnw.cmd test PASS (12/12); paid registrations create charges, capacity is persisted, settlement confirms entry | 8343972 |
 | T19 | PASS | ./mvnw.cmd test PASS (12/12); elimination results create next-round slots and champion completion | 2ea3958 |
-| T20 | TODO | | |
+| T20 | PASS | ./mvnw.cmd test PASS (12/12); winner score validation and standings service added | afaba7e |
 | T21 | TODO | | |
 | T22 | TODO | | |
 | T23 | TODO | | |
@@ -45,6 +45,7 @@ Next exact action: validate round-robin result handling, standings and duplicate
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
