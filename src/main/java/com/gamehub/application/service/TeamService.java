@@ -1,1 +1,32 @@
-package com.gamehub.application.service; import com.gamehub.application.OperationsService; import java.util.List; public final class TeamService { private final OperationsService ops; public TeamService(OperationsService ops){this.ops=ops;} public List<String> teams()throws Exception{return ops.teams();} public List<String> requests(long c)throws Exception{return ops.teamRequests(c);} public long create(long c,String n)throws Exception{return ops.createTeam(c,n);} public void request(long t,long c)throws Exception{ops.requestJoin(t,c);} public void decide(long c,long t,long m,boolean ok)throws Exception{ops.decideJoin(c,t,m,ok);} }
+package com.gamehub.application.service;
+import com.gamehub.infrastructure.*;
+import com.gamehub.domain.pricing.*;
+import java.sql.*;
+import java.time.*;
+import java.util.*;
+import java.nio.file.Path;
+
+/** Focused application workflows for Team. */
+public final class TeamService extends ApplicationSupport {
+    private final TeamRepository teamRepository;
+    public TeamService(Database db) {
+        super(db);
+        this.teamRepository = new TeamRepository(db.connection());
+    }
+  public long createTeam(long captainId,String name)throws SQLException {requireCustomer(captainId);require(!norm(name).isBlank(),"Team name is required");transactions.begin();try{try(var p=teamRepository.createTeam(norm(name), captainId, now())){p.executeUpdate();try(var k=p.getGeneratedKeys()){k.next();long id=k.getLong(1);try(var m=teamRepository.createTeamQuery2(id, captainId, now())){m.executeUpdate();}transactions.commit();return id;}}}catch(Exception e){transactions.rollback();if(e instanceof SQLException x)throw x;if(e instanceof RuntimeException x)throw x;throw new SQLException(e);}finally{transactions.restoreAutoCommit();}}
+
+  public void requestJoin(long teamId,long userId)throws SQLException {requireCustomer(userId);transactions.begin();try{try(var q=teamRepository.requestJoin(teamId)){try(var r=q.executeQuery()){if(!r.next()||r.getInt(1)>=5)throw new IllegalStateException("Team is full");}}try(var p=teamRepository.requestJoinQuery2(teamId, userId, now())){p.executeUpdate();}try(var p=teamRepository.requestJoinQuery3(teamId, userId)){p.executeUpdate();}transactions.commit();}catch(Exception e){transactions.rollback();if(e instanceof SQLException x)throw x;if(e instanceof RuntimeException x)throw x;throw new SQLException(e);}finally{transactions.restoreAutoCommit();}}
+
+  public void decideJoin(long captainId,long teamId,long userId,boolean approve)throws SQLException {try(var q=teamRepository.decideJoin(teamId)){try(var r=q.executeQuery()){if(!r.next()||r.getLong(1)!=captainId)throw new SecurityException("Only the captain can decide join requests");}}String st=approve?"ACCEPTED":"REJECTED";if(approve){try(var q=teamRepository.decideJoinQuery2(teamId)){try(var r=q.executeQuery()){r.next();if(r.getInt(1)>=5)throw new IllegalStateException("Team is full");}}}try(var p=teamRepository.decideJoinQuery3(st, teamId, userId)){if(p.executeUpdate()!=1)throw new IllegalArgumentException("Pending request not found");}try(var p=teamRepository.decideJoinQuery4(st, captainId, now(), teamId, userId)){p.executeUpdate();}}
+
+  public List<String> teamRequests(long captainId)throws SQLException {List<String> out=new ArrayList<>();try(var p=teamRepository.teamRequests(captainId)){try(var r=p.executeQuery()){while(r.next())out.add("#"+r.getLong(1)+" | "+r.getString(2)+" | member #"+r.getLong(3)+" ("+r.getString(4)+")");}}return out;}
+
+  public List<String> teams()throws SQLException {List<String> out=new ArrayList<>();try(var s=teamRepository.teams();var r=s.executeQuery()){while(r.next())out.add("#"+r.getLong(1)+" "+r.getString(2));}return out;}
+
+  public List<String> captainTeams(long captainId)throws SQLException {requireCustomer(captainId);List<String> out=new ArrayList<>();try(var q=teamRepository.captainTeams(captainId)){try(var r=q.executeQuery()){while(r.next())out.add("#"+r.getLong(1)+" | "+r.getString(2)+" | Roster "+r.getInt(3));}}return out;}
+
+  public List<String> requests(long c) throws Exception {return teamRequests(c);}
+  public long create(long c,String n) throws Exception {return createTeam(c,n);}
+  public void request(long t,long c) throws Exception {requestJoin(t,c);}
+  public void decide(long c,long t,long m,boolean ok) throws Exception {decideJoin(c,t,m,ok);}
+}
