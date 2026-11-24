@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
 Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T17
-Next exact action: type tournament configuration and lifecycle transitions, then test invalid states
+Current task: T18
+Next exact action: enforce tournament registration eligibility, fee settlement and capacity
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -24,7 +24,7 @@ Next exact action: type tournament configuration and lifecycle transitions, then
 | T14 | PASS | ./mvnw.cmd test PASS (11/11); membership UI reads persisted plans and removes arbitrary fee/duration inputs | 944a851 |
 | T15 | PASS | ./mvnw.cmd test PASS (12/12); team join writes are transactional with capacity and captain checks | a2a80f8 |
 | T16 | PASS | ./mvnw.cmd test PASS (12/12); team UI uses selectable teams and pending captain requests | a2a80f8 |
-| T17 | TODO | | |
+| T17 | PASS | ./mvnw.cmd test PASS (12/12); approved formats enforced and management UI uses ComboBox | 23c7fb6 |
 | T18 | TODO | | |
 | T19 | TODO | | |
 | T20 | TODO | | |
@@ -45,6 +45,7 @@ Next exact action: type tournament configuration and lifecycle transitions, then
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
