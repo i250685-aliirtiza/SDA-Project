@@ -1,8 +1,8 @@
 # GameHub execution state
 Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: main
-Last verified commit: 059dc25
-Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (13 tests); javafx:run startup reached application process
+Last verified commit: 456c566
+Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (16 tests); javafx:run startup reached application process
 Current task: T31
 Next exact action: final report with GUI startup evidence and remaining manual click-through limitation.
 ## Task ledger
@@ -16,7 +16,7 @@ Next exact action: final report with GUI startup evidence and remaining manual c
 | T06 | PASS | ./mvnw.cmd test PASS (11/11); manager station changes and future-reservation guards enforced | d601f9a |
 | T07 | PASS | ./mvnw.cmd test PASS (11/11); half-open overlap and future interval validation verified by existing reservation tests | d601f9a |
 | T08 | PASS | ./mvnw.cmd test PASS (11/11); reservation UI uses Karachi DatePicker/time controls and selected station rows | 50f5ea0 |
-| T09 | PASS | ./mvnw.cmd test PASS (11/11); start/finish updates reservation and station lifecycle, cancellation guarded | 7c66ce2 |
+| T09 | PASS | ./mvnw.cmd test PASS (16/16); session arrival eligibility, walk-in conflicts and planned-end lifecycle verified | 456c566 |
 | T10 | PASS | ./mvnw.cmd test PASS; calculated session billing path uses persisted rate and elapsed time | 0ed5722 |
 | T11 | PASS | ./mvnw.cmd test PASS; payment reference required and identical idempotent replay returns original payment | 0ed5722 |
 | T12 | PASS | ./mvnw.cmd test PASS (11/11); staff settlement selects outstanding charges and shows receipt | 944a851 |
@@ -35,7 +35,7 @@ Next exact action: final report with GUI startup evidence and remaining manual c
 | T25 | PASS | Traceability, checklist, design decisions and demo script added with explicit pending GUI evidence | 66969b5 |
 | T26 | PASS | ReportRepository extracted as a real SQL boundary and OperationsService delegates report queries; remaining workflows remain facade-backed | c9f8db5 |
 | T27 | PASS | ./mvnw.cmd test PASS; personnel hierarchy and demo compile | 8d9b885 |
-| T28 | PASS | All visible workflows use record selectors, empty states, disabled prerequisites, feedback and automatic refresh; javafx:run startup verified, click-through pending | b596815 |
+| T28 | PASS | All visible workflows use record selectors, empty states, disabled prerequisites, feedback, auto-load and refresh; javafx:run startup verified, click-through pending | 456c566 |
 | T29 | PASS | ChainedAcceptanceTest passes with restart and persisted users, payments, memberships and tournament state | 95cb92d |
 | T30 | PASS | README, checklist, traceability, decisions, final report and demo script updated | 66969b5 |
 | T31 | PASS | ./mvnw.cmd clean verify PASS (13/13), javafx:run startup reached application process, origin/main verified | 4810bbb |
@@ -45,6 +45,7 @@ Next exact action: final report with GUI startup evidence and remaining manual c
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
