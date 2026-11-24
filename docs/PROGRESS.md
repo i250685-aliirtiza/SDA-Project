@@ -2,9 +2,9 @@
 Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
-Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T26
-Next exact action: run clean verify, inspect reports, then finalize remaining task ledger and push branch
+Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (12 tests)
+Current task: T29
+Next exact action: add chained service integration test or preserve explicit TODO before final response
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -33,18 +33,19 @@ Next exact action: run clean verify, inspect reports, then finalize remaining ta
 | T23 | PASS | ./mvnw.cmd test PASS (12/12); maintenance UI selects station and ticket records | 632f432 |
 | T24 | PASS | ./mvnw.cmd test PASS (12/12); manager-authorized date-filtered revenue and reservation report UI added | 8e94ed9 |
 | T25 | PASS | Traceability, checklist, design decisions and demo script added with explicit pending GUI evidence | 66969b5 |
-| T26 | TODO | | |
+| T26 | TODO | Facade remains and repository extraction is not complete | |
 | T27 | PASS | ./mvnw.cmd test PASS; personnel hierarchy and demo compile | 8d9b885 |
-| T28 | TODO | | |
-| T29 | TODO | | |
+| T28 | PASS | UI controls, feedback region, scroll workspace and selection-driven actions updated; manual GUI evidence pending | c167462 |
+| T29 | TODO | Chained end-to-end integration test not yet added | |
 | T30 | PASS | README, checklist, traceability, decisions, final report and demo script updated | 66969b5 |
-| T31 | TODO | | |
+| T31 | PASS | ./mvnw.cmd clean verify PASS (12/12), branch pushed to origin/gamehub-completion | c167462 |
 ## Active handoff
 - Modified paths:
 - Last test command and real outcome:
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
