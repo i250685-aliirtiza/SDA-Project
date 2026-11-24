@@ -1,3 +1,3 @@
 package com.gamehub.application.controller;
-import com.gamehub.application.OperationsService;
-public final class PaymentController { private final OperationsService ops; public PaymentController(OperationsService ops){this.ops=ops;} public long settle(long staff,long charge,long amount,String method,String reference)throws Exception{if(amount<=0||reference==null||reference.isBlank())throw new IllegalArgumentException("Amount and reference are required");return ops.payChargeAsStaff(staff,charge,amount,method,reference);} }
+import com.gamehub.application.OperationsService; import java.util.List;
+public final class PaymentController { private final OperationsService ops; public PaymentController(OperationsService ops){this.ops=ops;} public List<String> outstanding()throws Exception{return ops.outstandingCharges();} public long settle(long staff,long charge,long amount,String method,String reference)throws Exception{if(amount<=0||reference==null||reference.isBlank())throw new IllegalArgumentException("Amount and reference are required");return ops.payChargeAsStaff(staff,charge,amount,method,reference);} }
