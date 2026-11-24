@@ -21,3 +21,8 @@ The application now has explicit application-layer controller counterparts under
 JavaFX integration evidence
 
 `GameHubApp` initializes all twelve controllers. Mutation and refresh handlers route through corresponding controller fields. The JavaFX shell contains no direct `OperationsService` calls.
+Application-service layer
+
+The controllers now depend on focused services under `com.gamehub.application.service`: `AccountService`, `ReservationService`, `SessionService`, `PaymentService`, `MembershipService`, `TeamService`, `TournamentRegistrationService`, `TournamentService`, `MatchService`, `StationService`, `MaintenanceService` and `ReportService`. `GameHubApp` composes those services into the twelve controllers.
+
+The focused services currently coordinate the verified `OperationsService` transaction implementation. This preserves existing transaction boundaries while making the D5 application boundary explicit. Full JDBC extraction from `OperationsService` remains the next infrastructure seam.
