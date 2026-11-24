@@ -3,13 +3,13 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
 Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T01
-Next exact action: fix GameHubApp persistent feedback and action error handling
+Current task: T03
+Next exact action: strengthen authenticated actor and role policy in OperationsService
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
-| T01 | TODO | | |
-| T02 | TODO | | |
+| T01 | PASS | ./mvnw.cmd test PASS; persistent workspace feedback implemented | e485000 |
+| T02 | PASS | ./mvnw.cmd test PASS; match controls no longer reparented | e485000 |
 | T03 | TODO | | |
 | T04 | TODO | | |
 | T05 | TODO | | |
@@ -34,7 +34,7 @@ Next exact action: fix GameHubApp persistent feedback and action error handling
 | T24 | TODO | | |
 | T25 | TODO | | |
 | T26 | TODO | | |
-| T27 | TODO | | |
+| T27 | PASS | ./mvnw.cmd test PASS; personnel hierarchy and demo compile | 8d9b885 |
 | T28 | TODO | | |
 | T29 | TODO | | |
 | T30 | TODO | | |
@@ -45,4 +45,5 @@ Next exact action: fix GameHubApp persistent feedback and action error handling
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
