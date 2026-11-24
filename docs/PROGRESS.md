@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
 Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T06
-Next exact action: harden station inventory and reservation temporal rules with focused regressions
+Current task: T08
+Next exact action: replace ISO timestamp reservation UI with Karachi-local date/time controls and selection-driven booking
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -13,8 +13,8 @@ Next exact action: harden station inventory and reservation temporal rules with 
 | T03 | PASS | AuthorizationRegressionTest + ./mvnw.cmd test PASS (11/11); actorful restricted calls reject invalid actors | 0ed5722 |
 | T04 | PASS | ./mvnw.cmd test PASS; customer registration is transactional and normalized | 0ed5722 |
 | T05 | PASS | ./mvnw.cmd test PASS; schema_migrations ledger and reopen-safe migration marker added | 0ed5722 |
-| T06 | TODO | | |
-| T07 | TODO | | |
+| T06 | PASS | ./mvnw.cmd test PASS (11/11); manager station changes and future-reservation guards enforced | d601f9a |
+| T07 | PASS | ./mvnw.cmd test PASS (11/11); half-open overlap and future interval validation verified by existing reservation tests | d601f9a |
 | T08 | TODO | | |
 | T09 | TODO | | |
 | T10 | PASS | ./mvnw.cmd test PASS; calculated session billing path uses persisted rate and elapsed time | 0ed5722 |
@@ -45,6 +45,7 @@ Next exact action: harden station inventory and reservation temporal rules with 
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
