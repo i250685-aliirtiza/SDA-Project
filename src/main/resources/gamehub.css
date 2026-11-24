@@ -28,3 +28,5 @@
 .dialog-pane .content.label { -fx-text-fill: #d6deeb; }
 .dialog-pane .header-panel { -fx-background-color: #172238; }
 .dialog-pane .button-bar .button { -fx-background-color: #2563eb; }
+
+.status-feedback { -fx-padding: 10 18 10 18; -fx-background-color: #111827; -fx-text-fill: #e5e7eb; -fx-font-size: 13px; }

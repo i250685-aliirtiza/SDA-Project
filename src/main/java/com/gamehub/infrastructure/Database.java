@@ -53,3 +53,4 @@ public final class Database implements AutoCloseable {
  }
  public Connection connection(){return connection;} public void close() throws SQLException{connection.close();}
 }
+
