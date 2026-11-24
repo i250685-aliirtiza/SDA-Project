@@ -18,3 +18,6 @@ The application now has explicit application-layer controller counterparts under
 | ReportController | Performs authorized summaries and CSV export |
 
 `ReservationInterval`, `ChargeBalance`, `PricingPolicy` and `StandardPricingPolicy` are meaningful domain/value objects. `ReportRepository` owns report SQL and `Database` owns migration/connection setup. `OperationsService` still contains legacy orchestration and SQL for several workflows, so the decomposition is incremental rather than complete repository extraction.
+JavaFX integration evidence
+
+`GameHubApp` initializes all twelve controllers. Mutation and refresh handlers route through corresponding controller fields. The JavaFX shell contains no direct `OperationsService` calls.
