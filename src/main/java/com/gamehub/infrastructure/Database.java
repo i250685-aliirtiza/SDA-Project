@@ -12,6 +12,11 @@ public final class Database implements AutoCloseable {
    ensureColumn("users", "active", "INTEGER NOT NULL DEFAULT 1");
    ensureColumn("tournaments", "capacity", "INTEGER NOT NULL DEFAULT 32");
    ensureColumn("tournaments", "entrant_type", "TEXT NOT NULL DEFAULT 'INDIVIDUAL'");
+   ensureColumn("tournaments", "game", "TEXT NOT NULL DEFAULT 'Gaming'");
+   ensureColumn("tournaments", "registration_open_at", "TEXT");
+   ensureColumn("tournaments", "registration_close_at", "TEXT");
+   ensureColumn("tournaments", "scheduled_start_at", "TEXT");
+   ensureColumn("tournaments", "eligibility", "TEXT NOT NULL DEFAULT ''");
    ensureColumn("gaming_stations", "specs", "TEXT NOT NULL DEFAULT ''");
    ensureColumn("gaming_stations", "active", "INTEGER NOT NULL DEFAULT 1");
    ensureColumn("reservations", "created_at", "TEXT NOT NULL DEFAULT ''");
