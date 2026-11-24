@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: 09d76c1
 Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (12 tests)
-Current task: T31
-Next exact action: final response with verified limitations. T26 architecture extraction and T29 chained integration remain TODO.
+Current task: T26
+Next exact action: architecture extraction remains the only code-structure gap. Preserve this explicit limitation and rerun the full clean gate.
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -36,7 +36,7 @@ Next exact action: final response with verified limitations. T26 architecture ex
 | T26 | TODO | Facade remains and repository extraction is not complete | |
 | T27 | PASS | ./mvnw.cmd test PASS; personnel hierarchy and demo compile | 8d9b885 |
 | T28 | PASS | UI controls, feedback region, scroll workspace and selection-driven actions updated; manual GUI evidence pending | c167462 |
-| T29 | TODO | Chained end-to-end integration test not yet added | |
+| T29 | PASS | ChainedAcceptanceTest passes with restart and persisted users, payments, memberships and tournament state | 95cb92d |
 | T30 | PASS | README, checklist, traceability, decisions, final report and demo script updated | 66969b5 |
 | T31 | PASS | ./mvnw.cmd clean verify PASS (12/12), branch pushed to origin/gamehub-completion | c167462 |
 ## Active handoff
@@ -45,6 +45,7 @@ Next exact action: final response with verified limitations. T26 architecture ex
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
