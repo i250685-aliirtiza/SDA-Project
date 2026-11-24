@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
 Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T13
-Next exact action: make membership activation payment-backed using persisted plan charges
+Current task: T15
+Next exact action: harden team creation, join decisions, uniqueness and captain authorization
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -20,7 +20,7 @@ Next exact action: make membership activation payment-backed using persisted pla
 | T10 | PASS | ./mvnw.cmd test PASS; calculated session billing path uses persisted rate and elapsed time | 0ed5722 |
 | T11 | PASS | ./mvnw.cmd test PASS; payment reference required and identical idempotent replay returns original payment | 0ed5722 |
 | T12 | PASS | ./mvnw.cmd test PASS (11/11); staff settlement selects outstanding charges and shows receipt | 944a851 |
-| T13 | TODO | | |
+| T13 | PASS | MembershipPaymentRegressionTest + ./mvnw.cmd test PASS; plan charge stays unpaid until staff settlement activates membership | 016a564 |
 | T14 | PASS | ./mvnw.cmd test PASS (11/11); membership UI reads persisted plans and removes arbitrary fee/duration inputs | 944a851 |
 | T15 | TODO | | |
 | T16 | TODO | | |
@@ -45,6 +45,7 @@ Next exact action: make membership activation payment-backed using persisted pla
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
