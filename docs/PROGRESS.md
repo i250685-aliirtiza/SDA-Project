@@ -33,7 +33,7 @@ Next exact action: final report with GUI startup evidence and remaining manual c
 | T23 | PASS | ./mvnw.cmd test PASS (12/12); maintenance UI selects station and ticket records | 632f432 |
 | T24 | PASS | Manager-authorized category/date report UI and CSV export regression added | 691ca2d |
 | T25 | PASS | Traceability, checklist, design decisions and demo script added with explicit pending GUI evidence | 66969b5 |
-| T26 | PASS | Twelve application-controller boundaries, domain value objects, pricing strategy and ReportRepository added; OperationsService remains a legacy orchestration seam | ed9b385 |
+| T26 | PASS | All twelve controllers are initialized and used by GameHubApp; no direct `ops.` calls remain in the JavaFX shell | 8ed25a6 |
 | T27 | PASS | ./mvnw.cmd test PASS; personnel hierarchy and demo compile | 8d9b885 |
 | T28 | PASS | All visible workflows use record selectors, empty states, disabled prerequisites, feedback, auto-load and refresh; javafx:run startup verified, click-through pending | 456c566 |
 | T29 | PASS | ChainedAcceptanceTest passes with restart and persisted users, payments, memberships and tournament state | 95cb92d |
@@ -45,6 +45,7 @@ Next exact action: final report with GUI startup evidence and remaining manual c
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
