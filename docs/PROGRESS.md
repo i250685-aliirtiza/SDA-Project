@@ -1,7 +1,7 @@
 # GameHub execution state
 Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
-Working branch: gamehub-completion
-Last verified commit: 09d76c1
+Working branch: main
+Last verified commit: fc3af36
 Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (12 tests)
 Current task: T26
 Next exact action: architecture extraction remains the only code-structure gap. Preserve this explicit limitation and rerun the full clean gate.
@@ -38,13 +38,14 @@ Next exact action: architecture extraction remains the only code-structure gap. 
 | T28 | PASS | UI controls, feedback region, scroll workspace and selection-driven actions updated; manual GUI evidence pending | c167462 |
 | T29 | PASS | ChainedAcceptanceTest passes with restart and persisted users, payments, memberships and tournament state | 95cb92d |
 | T30 | PASS | README, checklist, traceability, decisions, final report and demo script updated | 66969b5 |
-| T31 | PASS | ./mvnw.cmd clean verify PASS (12/12), branch pushed to origin/gamehub-completion | c167462 |
+| T31 | PASS | ./mvnw.cmd clean verify PASS (13/13), origin/main verified | fc3af36 |
 ## Active handoff
 - Modified paths:
 - Last test command and real outcome:
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
