@@ -1,7 +1,7 @@
 # GameHub execution state
 Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: main
-Last verified commit: b596815
+Last verified commit: 4810bbb
 Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (13 tests); javafx:run startup reached application process
 Current task: T31
 Next exact action: final report with GUI startup evidence and remaining manual click-through limitation.
@@ -38,13 +38,14 @@ Next exact action: final report with GUI startup evidence and remaining manual c
 | T28 | PASS | All visible workflows use record selectors, empty states, disabled prerequisites, feedback and automatic refresh; javafx:run startup verified, click-through pending | b596815 |
 | T29 | PASS | ChainedAcceptanceTest passes with restart and persisted users, payments, memberships and tournament state | 95cb92d |
 | T30 | PASS | README, checklist, traceability, decisions, final report and demo script updated | 66969b5 |
-| T31 | PASS | ./mvnw.cmd clean verify PASS (13/13), javafx:run startup reached application process, origin/main pending latest push | b596815 |
+| T31 | PASS | ./mvnw.cmd clean verify PASS (13/13), javafx:run startup reached application process, origin/main verified | 4810bbb |
 ## Active handoff
 - Modified paths:
 - Last test command and real outcome:
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
