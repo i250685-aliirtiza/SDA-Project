@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
 Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T19
-Next exact action: generate complete single-elimination advancement and deterministic bracket matches
+Current task: T20
+Next exact action: validate round-robin result handling, standings and duplicate match results
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -26,7 +26,7 @@ Next exact action: generate complete single-elimination advancement and determin
 | T16 | PASS | ./mvnw.cmd test PASS (12/12); team UI uses selectable teams and pending captain requests | a2a80f8 |
 | T17 | PASS | ./mvnw.cmd test PASS (12/12); approved formats enforced and management UI uses ComboBox | 23c7fb6 |
 | T18 | PASS | ./mvnw.cmd test PASS (12/12); paid registrations create charges, capacity is persisted, settlement confirms entry | 8343972 |
-| T19 | TODO | | |
+| T19 | PASS | ./mvnw.cmd test PASS (12/12); elimination results create next-round slots and champion completion | 2ea3958 |
 | T20 | TODO | | |
 | T21 | TODO | | |
 | T22 | TODO | | |
@@ -45,6 +45,7 @@ Next exact action: generate complete single-elimination advancement and determin
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
