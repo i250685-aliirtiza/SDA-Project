@@ -1,21 +1,11 @@
 # GameHub
 
-Offline-first JavaFX desktop application for gaming-café reservations, sessions, tournaments, maintenance, and reporting.
-
-## Prerequisites
-Java 21 and Maven 3.9+ are required. This workspace currently has neither installed, so verification must be run after installing them.
+Java 21 and JavaFX desktop application for gaming-station reservations, sessions, payments, memberships, teams, tournaments, maintenance and reports.
 
 ## Run
-Windows: `mvnw.cmd clean verify` then `mvnw.cmd javafx:run` (or use `mvn` if installed).
-Unix: `./mvnw clean verify` then `./mvnw javafx:run`.
 
-The database is created at `%USERPROFILE%/.gamehub/gamehub.db` (or `$HOME/.gamehub/gamehub.db`). Set `GAMEHUB_DB_PATH` to override it. A manager account can be bootstrapped from the first-launch screen.
+Windows: `./mvnw.cmd clean verify` then `./mvnw.cmd javafx:run`
 
-## Scope
-The implementation follows `implementation.md`, uses JavaFX 21, SQLite JDBC, prepared statements, transactions, and role-aware application services. Payment is cash/manual external confirmation only; no live gateway is implied.
+Unix: `./mvnw clean verify` then `./mvnw javafx:run`
 
-## Environment setup record
-
-On Windows 11 (build 26300), Git was already installed. JDK 21.0.13.1 and Maven 3.9.11 were downloaded into the user-writable directory `C:\Users\Dell\AppData\Local\GameHubTools` because system-wide installation was not available without elevation. Maven Wrapper files are included in this repository.
-
-Verified with the provisioned toolchain: `mvnw.cmd test` passes. `mvnw.cmd clean verify` compiles and packages successfully. JavaFX launch was invoked; the first invocation was still resolving plugin dependencies when the interactive process was stopped, so a visible window has not been verified in this session.
+The database defaults to `%USERPROFILE%\\.gamehub\\gamehub.db` on Windows and `$HOME/.gamehub/gamehub.db` on Unix. Set `GAMEHUB_DB_PATH` for an isolated demo or test database. First launch provides manager bootstrap. Public signup creates customers. Staff and organizers are provisioned by an authenticated manager through the service layer.
