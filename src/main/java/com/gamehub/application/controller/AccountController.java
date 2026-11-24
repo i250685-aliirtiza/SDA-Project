@@ -1,0 +1,3 @@
+package com.gamehub.application.controller;
+import com.gamehub.application.UserService; import com.gamehub.domain.User;
+public final class AccountController { private final UserService users; public AccountController(UserService users){this.users=users;} public User authenticate(String login,String password)throws Exception{if(login==null||login.isBlank()||password==null||password.isBlank())throw new IllegalArgumentException("Credentials are required");return users.authenticate(login,password);} public User register(String name,String email,String phone,String password,String confirmation)throws Exception{if(!password.equals(confirmation))throw new IllegalArgumentException("Passwords do not match");return users.registerCustomer(name,email,phone,password);} }

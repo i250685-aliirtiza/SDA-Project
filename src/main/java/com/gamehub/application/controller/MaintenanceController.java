@@ -1,0 +1,3 @@
+package com.gamehub.application.controller;
+import com.gamehub.application.OperationsService;
+public final class MaintenanceController { private final OperationsService ops; public MaintenanceController(OperationsService ops){this.ops=ops;} public long report(long staff,long station,String severity,String description)throws Exception{return ops.openMaintenance(staff,station,severity,description);} public void update(long staff,long ticket,String status,String notes,boolean ready)throws Exception{ops.updateMaintenance(staff,ticket,status,notes,ready);} }

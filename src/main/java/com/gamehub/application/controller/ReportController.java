@@ -1,0 +1,3 @@
+package com.gamehub.application.controller;
+import com.gamehub.application.OperationsService; import java.time.Instant; import java.nio.file.Path; import java.util.Map;
+public final class ReportController { private final OperationsService ops; public ReportController(OperationsService ops){this.ops=ops;} public Map<String,Long> summary(long manager,Instant from,Instant to)throws Exception{return ops.reportSummary(manager,from,to);} public void export(long manager,String category,Instant from,Instant to,Path target)throws Exception{ops.exportReportCsv(manager,category,from,to,target);} }

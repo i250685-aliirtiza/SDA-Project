@@ -1,0 +1,3 @@
+package com.gamehub.application.controller;
+import com.gamehub.application.OperationsService;
+public final class MembershipController { private final OperationsService ops; public MembershipController(OperationsService ops){this.ops=ops;} public long subscribe(long customer,String plan)throws Exception{if(plan==null||plan.isBlank())throw new IllegalArgumentException("Select a membership plan");return ops.subscribeOrRenew(customer,plan);} }

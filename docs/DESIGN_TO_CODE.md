@@ -1,8 +1,20 @@
 # Design to code
 
-`GameHubApp` is the JavaFX composition and navigation shell. `OperationsService` owns application orchestration and transaction boundaries. `UserService` owns account identity and password hashing. `Database` owns SQLite connection setup and migration. The personnel hierarchy is intentionally isolated under `com.gamehub.personnel` as required by D4.
+The application now has explicit application-layer controller counterparts under `com.gamehub.application.controller`. These are used as orchestration boundaries from the JavaFX shell for reservations, sessions and reports, and expose the corresponding validated operations for the other use cases.
 
-Information Expert is used by `OperationsService` for workflow invariants and by `Database` for persistence setup. Controller responsibilities are represented by service methods called from JavaFX actions. Prepared statements and typed Java time and money values provide protected variation at infrastructure boundaries.
+| D5 responsibility | Implementation |
+|---|---|
+| AccountController | `application/controller/AccountController` validates credentials and delegates account registration/authentication |
+| ReservationController | Uses `ReservationInterval` and delegates reservation ownership/cancellation |
+| SessionController | Delegates reserved and walk-in sessions, extension and completion |
+| PaymentController | Validates staff settlement input and delegates payment |
+| MembershipController | Validates plan selection and delegates catalog-backed membership |
+| TeamController | Delegates team creation, requests and captain decisions |
+| RegistrationController | Supports solo and team entrant registration |
+| TournamentController | Creates/configures drafts and enforces lifecycle orchestration |
+| MatchController | Generates, schedules, starts, records and corrects matches |
+| StationController | Creates, edits and deactivates stations |
+| MaintenanceController | Reports and transitions maintenance tickets |
+| ReportController | Performs authorized summaries and CSV export |
 
-`ReportRepository` now owns report SQL and `OperationsService` delegates report aggregates to it. Tournament, payment and reservation orchestration remain in `OperationsService` and are recorded as the remaining structural consolidation opportunity.
-
+`ReservationInterval`, `ChargeBalance`, `PricingPolicy` and `StandardPricingPolicy` are meaningful domain/value objects. `ReportRepository` owns report SQL and `Database` owns migration/connection setup. `OperationsService` still contains legacy orchestration and SQL for several workflows, so the decomposition is incremental rather than complete repository extraction.

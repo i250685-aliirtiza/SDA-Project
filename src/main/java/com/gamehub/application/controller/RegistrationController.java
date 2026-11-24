@@ -1,0 +1,3 @@
+package com.gamehub.application.controller;
+import com.gamehub.application.OperationsService;
+public final class RegistrationController { private final OperationsService ops; public RegistrationController(OperationsService ops){this.ops=ops;} public long registerSolo(long tournament,long customer)throws Exception{return ops.registerTournament(tournament,customer);} public long registerTeam(long tournament,long captain,long team)throws Exception{return ops.registerTournamentTeam(tournament,captain,team);} }

@@ -1,0 +1,3 @@
+package com.gamehub.application.controller;
+import com.gamehub.application.OperationsService;
+public final class StationController { private final OperationsService ops; public StationController(OperationsService ops){this.ops=ops;} public long create(long manager,String code,String type,String specs,long rate)throws Exception{return ops.addStation(manager,code,type,specs,rate);} public void update(long manager,long station,String type,String specs,long rate)throws Exception{ops.updateStation(manager,station,type,specs,rate);} public void deactivate(long manager,long station)throws Exception{ops.deactivateStation(manager,station);} }

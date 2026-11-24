@@ -1,0 +1,3 @@
+package com.gamehub.application.controller;
+import com.gamehub.application.OperationsService;
+public final class SessionController { private final OperationsService ops; public SessionController(OperationsService ops){this.ops=ops;} public long startReserved(long staff,long reservation)throws Exception{return ops.startSession(staff,reservation);} public long startWalkIn(long staff,long customer,long station,int minutes)throws Exception{return ops.startWalkInSession(staff,customer,station,minutes);} public void extend(long staff,long session,int minutes)throws Exception{ops.extendSession(staff,session,minutes);} public long finish(long staff,long session)throws Exception{return ops.finishSessionCalculated(staff,session);} }
