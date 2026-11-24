@@ -4,4 +4,5 @@
 
 Information Expert is used by `OperationsService` for workflow invariants and by `Database` for persistence setup. Controller responsibilities are represented by service methods called from JavaFX actions. Prepared statements and typed Java time and money values provide protected variation at infrastructure boundaries.
 
-Known deviation: the current application still has a facade-shaped `OperationsService` rather than separate repositories and controllers. This is recorded as remaining architecture work.
+`ReportRepository` now owns report SQL and `OperationsService` delegates report aggregates to it. Tournament, payment and reservation orchestration remain in `OperationsService` and are recorded as the remaining structural consolidation opportunity.
+

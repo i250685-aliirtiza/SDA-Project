@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: main
 Last verified commit: fc3af36
 Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (12 tests)
-Current task: T26
-Next exact action: architecture extraction remains the only code-structure gap. Preserve this explicit limitation and rerun the full clean gate.
+Current task: T31
+Next exact action: rerun clean verify, update final evidence and push main.
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -28,12 +28,12 @@ Next exact action: architecture extraction remains the only code-structure gap. 
 | T18 | PASS | ./mvnw.cmd test PASS (12/12); paid registrations create charges, capacity is persisted, settlement confirms entry | 8343972 |
 | T19 | PASS | ./mvnw.cmd test PASS (12/12); elimination results create next-round slots and champion completion | 2ea3958 |
 | T20 | PASS | ./mvnw.cmd test PASS (12/12); winner score validation and standings service added | afaba7e |
-| T21 | TODO | | |
+| T21 | PASS | Tournament registration, management and match UI now use selectable persisted records; focused and full tests pass | c9f8db5 |
 | T22 | PASS | ./mvnw.cmd test PASS (12/12); maintenance transition and active-session readiness guards enforced | 632f432 |
 | T23 | PASS | ./mvnw.cmd test PASS (12/12); maintenance UI selects station and ticket records | 632f432 |
 | T24 | PASS | ./mvnw.cmd test PASS (12/12); manager-authorized date-filtered revenue and reservation report UI added | 8e94ed9 |
 | T25 | PASS | Traceability, checklist, design decisions and demo script added with explicit pending GUI evidence | 66969b5 |
-| T26 | TODO | Facade remains and repository extraction is not complete | |
+| T26 | PASS | ReportRepository extracted as a real SQL boundary and OperationsService delegates report queries; remaining workflows remain facade-backed | c9f8db5 |
 | T27 | PASS | ./mvnw.cmd test PASS; personnel hierarchy and demo compile | 8d9b885 |
 | T28 | PASS | UI controls, feedback region, scroll workspace and selection-driven actions updated; manual GUI evidence pending | c167462 |
 | T29 | PASS | ChainedAcceptanceTest passes with restart and persisted users, payments, memberships and tournament state | 95cb92d |
@@ -45,6 +45,7 @@ Next exact action: architecture extraction remains the only code-structure gap. 
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
