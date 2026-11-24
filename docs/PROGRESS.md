@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
 Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T22
-Next exact action: enforce maintenance ticket state transitions and station readiness guards
+Current task: T24
+Next exact action: add date-filtered management report aggregates and role enforcement
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -29,8 +29,8 @@ Next exact action: enforce maintenance ticket state transitions and station read
 | T19 | PASS | ./mvnw.cmd test PASS (12/12); elimination results create next-round slots and champion completion | 2ea3958 |
 | T20 | PASS | ./mvnw.cmd test PASS (12/12); winner score validation and standings service added | afaba7e |
 | T21 | TODO | | |
-| T22 | TODO | | |
-| T23 | TODO | | |
+| T22 | PASS | ./mvnw.cmd test PASS (12/12); maintenance transition and active-session readiness guards enforced | 632f432 |
+| T23 | PASS | ./mvnw.cmd test PASS (12/12); maintenance UI selects station and ticket records | 632f432 |
 | T24 | TODO | | |
 | T25 | TODO | | |
 | T26 | TODO | | |
@@ -45,6 +45,7 @@ Next exact action: enforce maintenance ticket state transitions and station read
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
