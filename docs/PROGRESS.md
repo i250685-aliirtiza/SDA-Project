@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
 Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T15
-Next exact action: harden team creation, join decisions, uniqueness and captain authorization
+Current task: T17
+Next exact action: type tournament configuration and lifecycle transitions, then test invalid states
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -22,8 +22,8 @@ Next exact action: harden team creation, join decisions, uniqueness and captain 
 | T12 | PASS | ./mvnw.cmd test PASS (11/11); staff settlement selects outstanding charges and shows receipt | 944a851 |
 | T13 | PASS | MembershipPaymentRegressionTest + ./mvnw.cmd test PASS; plan charge stays unpaid until staff settlement activates membership | 016a564 |
 | T14 | PASS | ./mvnw.cmd test PASS (11/11); membership UI reads persisted plans and removes arbitrary fee/duration inputs | 944a851 |
-| T15 | TODO | | |
-| T16 | TODO | | |
+| T15 | PASS | ./mvnw.cmd test PASS (12/12); team join writes are transactional with capacity and captain checks | a2a80f8 |
+| T16 | PASS | ./mvnw.cmd test PASS (12/12); team UI uses selectable teams and pending captain requests | a2a80f8 |
 | T17 | TODO | | |
 | T18 | TODO | | |
 | T19 | TODO | | |
@@ -45,6 +45,7 @@ Next exact action: harden team creation, join decisions, uniqueness and captain 
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
