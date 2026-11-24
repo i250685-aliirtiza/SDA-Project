@@ -3,6 +3,7 @@ package com.gamehub.infrastructure;
 import java.sql.*;
 import java.time.Instant;
 import java.util.*;
+import java.nio.file.*;
 
 /** SQL boundary for management report aggregates. */
 public final class ReportRepository {
@@ -12,6 +13,7 @@ public final class ReportRepository {
     if (!Set.of("users","gaming_stations","reservations","sessions","payments","teams","tournaments","maintenance","charges","registrations").contains(table)) throw new IllegalArgumentException("Unsupported report");
     try (var s=connection.createStatement(); var r=s.executeQuery("SELECT COUNT(*) FROM "+table)) { r.next(); return r.getLong(1); }
   }
+  public void exportCsv(String category, Instant from, Instant to, Path target) throws SQLException, java.io.IOException {Map<String,Long> values=summary(from,to);StringBuilder csv=new StringBuilder("category,metric,value\n");String safe=category==null?"SUMMARY":category.replace("\"","\"\"");for(var e:values.entrySet())csv.append("\"").append(safe).append("\",\"").append(e.getKey()).append("\",").append(e.getValue()).append("\n");Files.writeString(target,csv.toString(),StandardOpenOption.CREATE,StandardOpenOption.TRUNCATE_EXISTING);}
   public Map<String,Long> summary(Instant from, Instant to) throws SQLException {
     if (from==null || to==null || from.isAfter(to)) throw new IllegalArgumentException("Invalid report date range");
     Map<String,Long> result=new LinkedHashMap<>();

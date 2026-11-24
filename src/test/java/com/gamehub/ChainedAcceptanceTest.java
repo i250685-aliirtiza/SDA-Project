@@ -30,7 +30,7 @@ class ChainedAcceptanceTest {
       Instant start = Instant.now().plusSeconds(3600);
       long reservation = ops.reserve(alice.id(), station, start, start.plusSeconds(3600));
       long session = ops.startSession(staff.id(), reservation);
-      ops.finishSession(session, 60000);
+      ops.finishSession(manager.id(), session, 60000);
       long sessionCharge; try (var q = db.connection().prepareStatement("SELECT charge_id FROM sessions WHERE id=?")) { q.setLong(1, session); try (var r = q.executeQuery()) { assertTrue(r.next()); sessionCharge = r.getLong(1); } }
       ops.payChargeAsStaff(staff.id(), sessionCharge, 60000, "CASH", "chain-session");
 
