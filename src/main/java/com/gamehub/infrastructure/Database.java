@@ -10,6 +10,7 @@ public final class Database implements AutoCloseable {
    // CREATE TABLE IF NOT EXISTS cannot add columns to those legacy tables, so
    // add the compatible columns first and keep every existing row intact.
    ensureColumn("users", "active", "INTEGER NOT NULL DEFAULT 1");
+   ensureColumn("tournaments", "capacity", "INTEGER NOT NULL DEFAULT 32");
    ensureColumn("gaming_stations", "specs", "TEXT NOT NULL DEFAULT ''");
    ensureColumn("gaming_stations", "active", "INTEGER NOT NULL DEFAULT 1");
    ensureColumn("reservations", "created_at", "TEXT NOT NULL DEFAULT ''");
