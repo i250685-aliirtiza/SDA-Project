@@ -1,12 +1,29 @@
 # Final execution state
-Baseline: f3ff42a7ba7410b8642c0791c3679a9ac3c5c310
-Candidate: chatgpt/repository-extraction
+Baseline: ee32c374695c6439
+Current commit: 351a1c24823e6101a679ea089de157f39130e5e0
+Branch: main
 
-- [x] Baseline UserRepository extraction.
-- [x] 126 statement creation sites extracted to 12 table-oriented repositories, including 263 unconditional parameter bindings.
-- [x] Production focused services no longer depend on OperationsService.
-- [x] Existing facade signatures preserved for integration clients.
-- [x] TransactionContext centralizes transaction operations on the shared database connection.
-- [x] Maven clean verify completed successfully on this candidate.
-- [ ] Remaining conditional bindings and JDBC result mapping still need typed repository APIs.
-- [ ] Complete domain and architectural acceptance audit and manual GUI tests.
+## Verified completed work
+- [x] UserService SQL extracted into UserRepository.
+- [x] OperationsService SQL extracted into 12 active repository groups.
+- [x] OperationsService contains 0 JDBC statement construction/execution calls.
+- [x] UserService contains 0 JDBC statement construction/execution calls.
+- [x] Focused application services no longer depend on OperationsService.
+- [x] GameHubApp contains no direct OperationsService calls.
+- [x] Shared TransactionContext and repository connection boundaries integrated.
+- [x] `./mvnw.cmd test`: 19 passed, 0 failed, 0 skipped.
+- [x] JavaFX startup reached the application process.
+
+## Remaining limitations
+- Some repository APIs still expose PreparedStatement/ResultSet rather than typed DTOs.
+- Full manual GUI acceptance remains human verification.
+- Existing uncommitted implementation.md and untracked user refactor script are preserved.
+
+## Final static counts
+- OperationsService SQL calls: 0
+- UserService SQL calls: 0
+- Application service SQL calls: 0 by static execution scan
+- JavaFX OperationsService references: 0
+
+## Next exact action
+Typed repository result APIs and manual role-by-role GUI acceptance.
