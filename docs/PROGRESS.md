@@ -2,7 +2,7 @@
 Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: main
 Last verified commit: aaf94cc
-Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (16 tests); javafx:run startup reached application process
+Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (19 tests); javafx:run startup reached application process
 Current task: T31
 Next exact action: final report with GUI startup evidence and remaining manual click-through limitation.
 ## Task ledger
@@ -10,7 +10,7 @@ Next exact action: final report with GUI startup evidence and remaining manual c
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
 | T01 | PASS | ./mvnw.cmd test PASS; persistent workspace feedback implemented | e485000 |
 | T02 | PASS | ./mvnw.cmd test PASS; match controls no longer reparented | e485000 |
-| T03 | PASS | AuthorizationRegressionTest + ./mvnw.cmd test PASS (11/11); actorful restricted calls reject invalid actors | 0ed5722 |
+| T03 | PASS | Actorless restricted production overloads removed; secure actor fixtures and authorization regressions pass | 691ca2d |
 | T04 | PASS | ./mvnw.cmd test PASS; customer registration is transactional and normalized | 0ed5722 |
 | T05 | PASS | ./mvnw.cmd test PASS; schema_migrations ledger and reopen-safe migration marker added | 0ed5722 |
 | T06 | PASS | ./mvnw.cmd test PASS (11/11); manager station changes and future-reservation guards enforced | d601f9a |
@@ -25,13 +25,13 @@ Next exact action: final report with GUI startup evidence and remaining manual c
 | T15 | PASS | ./mvnw.cmd test PASS (12/12); team join writes are transactional with capacity and captain checks | a2a80f8 |
 | T16 | PASS | ./mvnw.cmd test PASS (12/12); team UI uses selectable teams and pending captain requests | a2a80f8 |
 | T17 | PASS | ./mvnw.cmd test PASS (12/12); approved formats enforced and management UI uses ComboBox | 23c7fb6 |
-| T18 | PASS | ./mvnw.cmd test PASS (12/12); paid registrations create charges, capacity is persisted, settlement confirms entry | 8343972 |
+| T18 | PASS | Team entrant type, captain registration, capacity and paid-entry regression coverage added; full suite passes | 691ca2d |
 | T19 | PASS | ./mvnw.cmd test PASS (12/12); elimination results create next-round slots and champion completion | 2ea3958 |
 | T20 | PASS | ./mvnw.cmd test PASS (12/12); winner score validation and standings service added | afaba7e |
 | T21 | PASS | Tournament registration, management, match and winner controls use selectable persisted records; full tests pass | b596815 |
 | T22 | PASS | ./mvnw.cmd test PASS (12/12); maintenance transition and active-session readiness guards enforced | 632f432 |
 | T23 | PASS | ./mvnw.cmd test PASS (12/12); maintenance UI selects station and ticket records | 632f432 |
-| T24 | PASS | ./mvnw.cmd test PASS (12/12); manager-authorized date-filtered revenue and reservation report UI added | 8e94ed9 |
+| T24 | PASS | Manager-authorized category/date report UI and CSV export regression added | 691ca2d |
 | T25 | PASS | Traceability, checklist, design decisions and demo script added with explicit pending GUI evidence | 66969b5 |
 | T26 | PASS | ReportRepository extracted as a real SQL boundary and OperationsService delegates report queries; remaining workflows remain facade-backed | c9f8db5 |
 | T27 | PASS | ./mvnw.cmd test PASS; personnel hierarchy and demo compile | 8d9b885 |
@@ -45,6 +45,7 @@ Next exact action: final report with GUI startup evidence and remaining manual c
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
