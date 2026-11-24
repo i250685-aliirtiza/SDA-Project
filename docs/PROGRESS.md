@@ -1,10 +1,10 @@
 # GameHub execution state
 Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: main
-Last verified commit: b3c9a64
-Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (13 tests)
+Last verified commit: b596815
+Baseline build: ./mvnw.cmd test PASS (10 tests), final ./mvnw.cmd clean verify PASS (13 tests); javafx:run startup reached application process
 Current task: T31
-Next exact action: rerun clean verify, update final evidence and push main.
+Next exact action: final report with GUI startup evidence and remaining manual click-through limitation.
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -28,23 +28,24 @@ Next exact action: rerun clean verify, update final evidence and push main.
 | T18 | PASS | ./mvnw.cmd test PASS (12/12); paid registrations create charges, capacity is persisted, settlement confirms entry | 8343972 |
 | T19 | PASS | ./mvnw.cmd test PASS (12/12); elimination results create next-round slots and champion completion | 2ea3958 |
 | T20 | PASS | ./mvnw.cmd test PASS (12/12); winner score validation and standings service added | afaba7e |
-| T21 | PASS | Tournament registration, management and match UI now use selectable persisted records; focused and full tests pass | c9f8db5 |
+| T21 | PASS | Tournament registration, management, match and winner controls use selectable persisted records; full tests pass | b596815 |
 | T22 | PASS | ./mvnw.cmd test PASS (12/12); maintenance transition and active-session readiness guards enforced | 632f432 |
 | T23 | PASS | ./mvnw.cmd test PASS (12/12); maintenance UI selects station and ticket records | 632f432 |
 | T24 | PASS | ./mvnw.cmd test PASS (12/12); manager-authorized date-filtered revenue and reservation report UI added | 8e94ed9 |
 | T25 | PASS | Traceability, checklist, design decisions and demo script added with explicit pending GUI evidence | 66969b5 |
 | T26 | PASS | ReportRepository extracted as a real SQL boundary and OperationsService delegates report queries; remaining workflows remain facade-backed | c9f8db5 |
 | T27 | PASS | ./mvnw.cmd test PASS; personnel hierarchy and demo compile | 8d9b885 |
-| T28 | PASS | UI controls, feedback region, scroll workspace and selection-driven actions updated; manual GUI evidence pending | c167462 |
+| T28 | PASS | All visible workflows use record selectors, empty states, disabled prerequisites, feedback and automatic refresh; javafx:run startup verified, click-through pending | b596815 |
 | T29 | PASS | ChainedAcceptanceTest passes with restart and persisted users, payments, memberships and tournament state | 95cb92d |
 | T30 | PASS | README, checklist, traceability, decisions, final report and demo script updated | 66969b5 |
-| T31 | PASS | ./mvnw.cmd clean verify PASS (13/13), origin/main verified | b3c9a64 |
+| T31 | PASS | ./mvnw.cmd clean verify PASS (13/13), javafx:run startup reached application process, origin/main pending latest push | b596815 |
 ## Active handoff
 - Modified paths:
 - Last test command and real outcome:
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
