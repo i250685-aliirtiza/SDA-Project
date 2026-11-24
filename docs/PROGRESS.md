@@ -3,8 +3,8 @@ Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: gamehub-completion
 Last verified commit: none
 Baseline build: ./mvnw.cmd test PASS (10 tests)
-Current task: T24
-Next exact action: add date-filtered management report aggregates and role enforcement
+Current task: T25
+Next exact action: reconcile remaining original extensions and create traceability/completion evidence docs
 ## Task ledger
 | Task | State (TODO/ACTIVE/PASS/BLOCKED) | Evidence command + result | Commit |
 | T00 | PASS | ./mvnw.cmd test PASS (10/10); original spec recovered | pending |
@@ -31,7 +31,7 @@ Next exact action: add date-filtered management report aggregates and role enfor
 | T21 | TODO | | |
 | T22 | PASS | ./mvnw.cmd test PASS (12/12); maintenance transition and active-session readiness guards enforced | 632f432 |
 | T23 | PASS | ./mvnw.cmd test PASS (12/12); maintenance UI selects station and ticket records | 632f432 |
-| T24 | TODO | | |
+| T24 | PASS | ./mvnw.cmd test PASS (12/12); manager-authorized date-filtered revenue and reservation report UI added | 8e94ed9 |
 | T25 | TODO | | |
 | T26 | TODO | | |
 | T27 | PASS | ./mvnw.cmd test PASS; personnel hierarchy and demo compile | 8d9b885 |
@@ -45,6 +45,7 @@ Next exact action: add date-filtered management report aggregates and role enfor
 - Remaining defect or failure:
 - Next exact command/edit:
 - External blockers (if any):
+
 
 
 
