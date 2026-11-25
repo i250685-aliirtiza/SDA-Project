@@ -4,9 +4,9 @@
 
 - Implementation number: 01
 - Starting commit SHA: `e0a848dadc3c8ac15286be9e7eb74dd318285466` (latest `origin/main` at start)
-- Final implementation commit SHA: recorded after the implementation commit
+- Final implementation commit SHA: `42beda90a46affb81fa4cfd1b28dfa899fa40cee` (implementation commit before report metadata amendment)
 - Branch: `main`
-- Remote push status: recorded after the implementation commit and push attempt
+- Remote push status: PASS — `git push origin main` updated `origin/main` from `e0a848d` to `42beda9`. Git emitted a local credential-cache warning after the remote accepted the push.
 
 ## B. Requirement coverage
 
