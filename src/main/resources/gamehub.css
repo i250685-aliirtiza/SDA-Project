@@ -7,9 +7,9 @@
     -fx-control-inner-background: #101925;
     -fx-text-base-color: #edf3fa;
     -fx-text-background-color: #edf3fa;
-    -fx-accent: #8eabff;
-    -fx-focus-color: #b3ccff;
-    -fx-faint-focus-color: #b3ccff30;
+    -fx-accent: #8b5cf6;
+    -fx-focus-color: #a78bfa;
+    -fx-faint-focus-color: #a78bfa30;
 
     -surface: #17212e;
     -surface-raised: #1e2b3b;
@@ -17,7 +17,8 @@
     -text: #edf3fa;
     -subtle: #b0bed0;
     -quiet: #94a5ba;
-    -lime: #c5f580;
+    -lime: #a78bfa;
+    -cyan: #22d3ee;
 }
 .label, .check-box { -fx-text-fill: -text; }
 .muted { -fx-text-fill: -subtle; -fx-font-size: 13px; }
@@ -32,8 +33,8 @@
     -fx-min-height: 38;
     -fx-cursor: hand;
 }
-.button:hover { -fx-background-color: #dcfdaa; }
-.button:armed { -fx-background-color: #a9d371; }
+.button:hover { -fx-background-color: #c4b5fd; }
+.button:armed { -fx-background-color: #7c3aed; }
 .button:focused { -fx-border-color: #d6e3ff; -fx-effect: dropshadow(gaussian, #9cb8ff66, 6, 0.25, 0, 0); }
 .button:disabled { -fx-opacity: 0.44; -fx-cursor: default; }
 .secondary {
@@ -232,3 +233,5 @@
 .dialog-pane > .header-panel .label { -fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: #f5f9ff; }
 .dialog-form { -fx-padding: 6 0; }
 .dialog-form .feedback { -fx-padding: 9 11; }
+
+
