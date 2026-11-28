@@ -14,7 +14,7 @@ The closure branch implements the primary audited defects and adds regression co
 
 The JavaFX application starts through `mvnw.cmd javafx:run` with an isolated database and remains running without a startup exception. The process was stopped manually after launch observation. No reproducible JavaFX click automation or TestFX suite is present, so GUI interaction evidence remains pending.
 
-**IMPLEMENTED — GUI VERIFICATION PENDING**
+**FUNCTIONAL FIXES STILL REQUIRED**
 
 ## 2. Changes by audit defect
 
@@ -139,7 +139,7 @@ The branch remains ready for a CSS-only visual enhancement after GUI verificatio
 
 ## 12. Final verdict
 
-**IMPLEMENTED — GUI VERIFICATION PENDING**
+**FUNCTIONAL FIXES STILL REQUIRED**
 
 
 
@@ -153,4 +153,10 @@ The branch remains ready for a CSS-only visual enhancement after GUI verificatio
 - Customer reservation reads now have an explicit actor-target API that rejects cross-customer access.
 - Tournament cancellation writes registration-level cancellation audit events in addition to tournament-level lifecycle audit.
 - Exact GUI interaction remains unavailable in this environment. The manual acceptance procedure is recorded in `docs/MANUAL_ACCEPTANCE_SCRIPT.md`.
+
+
+
+## Final acceptance pass limitations
+
+The focused fixes are implemented and tested, but several legacy operational read methods still lack actor parameters, including session, outstanding-charge, maintenance-ticket, match-detail, and some station-inventory reads exposed through OperationsService or focused services. These reads remain reachable outside navigation guards. Full GUI interaction also remains unavailable. The branch therefore requires one additional authorization sweep before functional certification.
 
