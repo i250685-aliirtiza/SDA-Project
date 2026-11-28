@@ -124,7 +124,7 @@ The estimate below is not an instructor grade. Automated functional evidence imp
 | Design-to-code consistency | 10 | 7-9 |
 | GRASP and GoF | 10 | 6-8 |
 | Documentation | 10 | 7-9 |
-| **Total** | **100** | **71-89** |
+| **Total** | **100** | **68-84** |
 
 ## 10. Outstanding limitations
 
@@ -159,4 +159,5 @@ The branch remains ready for a CSS-only visual enhancement after GUI verificatio
 ## Final acceptance pass limitations
 
 The focused fixes are implemented and tested, but several legacy operational read methods still lack actor parameters, including session, outstanding-charge, maintenance-ticket, match-detail, and some station-inventory reads exposed through OperationsService or focused services. These reads remain reachable outside navigation guards. Full GUI interaction also remains unavailable. The branch therefore requires one additional authorization sweep before functional certification.
+
 
