@@ -6,7 +6,7 @@ Baseline commit: `683ae5e0bcdf9b6218a8f341b679370c881fc2a0`
 
 Final branch: `gamehub-final-functional`
 
-Final commit: recorded after this report and the verification run
+Final commit: `ebedd08ee81c63fde8145a0155a2ab5637988eeb`
 
 The closure branch implements the primary audited defects and adds regression coverage. The Maven verification suite passes with 34 tests. Four new tests cover match allocation conflicts, tournament cancellation propagation, maintenance duplicate and affected reservations, and registration auditing.
 
@@ -138,3 +138,4 @@ The branch remains ready for a CSS-only visual enhancement after GUI verificatio
 ## 12. Final verdict
 
 **IMPLEMENTED — GUI VERIFICATION PENDING**
+
