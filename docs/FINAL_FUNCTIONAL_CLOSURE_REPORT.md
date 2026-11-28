@@ -158,6 +158,7 @@ The branch remains ready for a CSS-only visual enhancement after GUI verificatio
 
 ## Final acceptance pass limitations
 
-The focused fixes are implemented and tested, but several legacy operational read methods still lack actor parameters, including session, outstanding-charge, maintenance-ticket, match-detail, and some station-inventory reads exposed through OperationsService or focused services. These reads remain reachable outside navigation guards. Full GUI interaction also remains unavailable. The branch therefore requires one additional authorization sweep before functional certification.
+The focused fixes are implemented and tested, but several legacy operational read methods still lack actor parameters, including session, outstanding-charge, maintenance-ticket, match-detail, and some station-inventory reads exposed through OperationsService or focused services. These reads remain reachable outside navigation guards. Match correction safely rejects winner changes after downstream rounds rather than rebuilding already-played dependent matches. Full GUI interaction also remains unavailable. The branch therefore requires one additional authorization sweep before functional certification.
+
 
 
