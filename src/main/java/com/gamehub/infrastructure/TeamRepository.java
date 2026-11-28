@@ -43,7 +43,7 @@ public final class TeamRepository {
     }
 
     public PreparedStatement requestJoinQuery2(long value1, long value2, String value3) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO team_members(team_id,user_id,status,role,joined_at) VALUES(?,?, 'PENDING','MEMBER',?)");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO team_members(team_id,user_id,status,role,joined_at) VALUES(?,?, 'PENDING','MEMBER',?) ON CONFLICT(team_id,user_id) DO UPDATE SET status='PENDING',joined_at=excluded.joined_at WHERE team_members.status='REJECTED'");
         try {
             statement.setLong(1, value1);
             statement.setLong(2, value2);

@@ -6,15 +6,26 @@ public final class TournamentRegistrationRepository {
     private final Connection connection;
     public TournamentRegistrationRepository(Connection connection) { this.connection=Objects.requireNonNull(connection); }
     public PreparedStatement payCharge(long value1, long value2) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("UPDATE registrations SET fee_status='PAID',status='CONFIRMED' WHERE id=(SELECT source_id FROM charges WHERE id=? AND source_type='TOURNAMENT') AND user_id=?");
+        PreparedStatement statement = connection.prepareStatement("UPDATE registrations SET fee_status='PAID',status='CONFIRMED' WHERE id=(SELECT source_id FROM charges WHERE id=? AND source_type='TOURNAMENT') AND status='PENDING' AND (user_id=? OR team_id IN (SELECT id FROM teams WHERE captain_id=?))");
         try {
             statement.setLong(1, value1);
             statement.setLong(2, value2);
+            statement.setLong(3, value2);
             return statement;
         } catch (SQLException | RuntimeException failure) {
             try { statement.close(); } catch (SQLException closeFailure) { failure.addSuppressed(closeFailure); }
             throw failure;
         }
+    }
+
+    public PreparedStatement myRegistrations(long userId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT r.id,t.name,COALESCE(team.name,'Individual'),r.status,r.fee_paisa FROM registrations r "
+                + "JOIN tournaments t ON t.id=r.tournament_id LEFT JOIN teams team ON team.id=r.team_id "
+                + "WHERE r.user_id=? OR team.captain_id=? ORDER BY r.id DESC");
+        statement.setLong(1, userId);
+        statement.setLong(2, userId);
+        return statement;
     }
 
     public PreparedStatement registrations(long value1) throws SQLException {
@@ -80,7 +91,7 @@ public final class TournamentRegistrationRepository {
     }
 
     public PreparedStatement registerTournamentTeamQuery2(long value1) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM registrations WHERE tournament_id=? AND status='CONFIRMED'");
+        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM registrations WHERE tournament_id=? AND status IN ('CONFIRMED','PENDING')");
         try {
             statement.setLong(1, value1);
             return statement;

@@ -9,6 +9,12 @@ import java.util.Objects;
 public final class UserRepository {
   private final Connection connection;
   public UserRepository(Connection connection){this.connection=Objects.requireNonNull(connection);}
+  public boolean hasManager() throws SQLException {
+    try (var statement = connection.prepareStatement("SELECT 1 FROM users WHERE role='MANAGER' LIMIT 1");
+         var result = statement.executeQuery()) {
+      return result.next();
+    }
+  }
   public boolean hasUsers() throws SQLException {try(var q=connection.prepareStatement("SELECT COUNT(*) FROM users");var r=q.executeQuery()){return r.next()&&r.getInt(1)>0;}}
   public long insertUser(String username,String passwordHash,String role,String createdAt)throws SQLException {try(var p=connection.prepareStatement("INSERT INTO users(username,password_hash,role,created_at) VALUES(?,?,?,?)",Statement.RETURN_GENERATED_KEYS)){p.setString(1,username);p.setString(2,passwordHash);p.setString(3,role);p.setString(4,createdAt);p.executeUpdate();try(var k=p.getGeneratedKeys()){k.next();return k.getLong(1);}}}
   public void insertCustomer(long userId,String fullName,String email,String phone,String createdAt)throws SQLException {try(var p=connection.prepareStatement("INSERT INTO customers(user_id,full_name,email,phone,created_at) VALUES(?,?,?,?,?)")){p.setLong(1,userId);p.setString(2,fullName);p.setString(3,email);p.setString(4,phone);p.setString(5,createdAt);p.executeUpdate();}}

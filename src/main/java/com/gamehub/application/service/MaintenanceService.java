@@ -15,11 +15,70 @@ public final class MaintenanceService extends ApplicationSupport {
         this.maintenanceRepository = new MaintenanceRepository(db.connection());
         this.stationRepository = new StationRepository(db.connection());
     }
-  public long openMaintenance(long staffId,long stationId,String severity,String description)throws SQLException { requireAuthenticated(staffId,"STAFF","MANAGER");require(Set.of("LOW","MEDIUM","HIGH","CRITICAL").contains(severity)&&!norm(description).isBlank(),"Severity and description are required");try(var p=maintenanceRepository.openMaintenance(stationId, norm(description), severity, now(), staffId)){com.gamehub.infrastructure.QueryExecutor.update(p);try(var k=com.gamehub.infrastructure.QueryExecutor.keys(p)){k.next();long id=k.getLong(1);try(var u=stationRepository.openMaintenance(stationId)){com.gamehub.infrastructure.QueryExecutor.update(u);}audit(staffId,"MAINTENANCE",id,"REPORTED",description);return id;}}}
+  public long openMaintenance(long staffId, long stationId, String severity, String description) throws SQLException {
+    requireAuthenticated(staffId, "STAFF", "MANAGER");
+    require(severity != null && Set.of("LOW", "MEDIUM", "HIGH", "CRITICAL").contains(severity)
+        && !norm(description).isBlank(), "Severity and description are required");
+    transactions.begin();
+    try {
+      try (var station = stationRepository.openMaintenance(stationId)) {
+        if (station.executeUpdate() != 1) throw new IllegalArgumentException("Active station not found");
+      }
+      long ticketId;
+      try (var statement = maintenanceRepository.openMaintenance(stationId, norm(description), severity, now(), staffId)) {
+        statement.executeUpdate();
+        try (var keys = statement.getGeneratedKeys()) {
+          if (!keys.next()) throw new SQLException("Maintenance ticket was not created");
+          ticketId = keys.getLong(1);
+        }
+      }
+      audit(staffId, "MAINTENANCE", ticketId, "REPORTED", description);
+      transactions.commit();
+      return ticketId;
+    } catch (SQLException | RuntimeException failure) {
+      transactions.rollback();
+      throw failure;
+    } finally {
+      transactions.restoreAutoCommit();
+    }
+  }
 
   public List<String> maintenanceTickets() throws SQLException {List<String> out=new ArrayList<>();try(var s=maintenanceRepository.maintenanceTickets();var r=com.gamehub.infrastructure.QueryExecutor.query(s)){while(r.next())out.add("#"+r.getLong(1)+" | Station "+r.getString(3)+" | "+r.getString(4)+" | "+r.getString(5)+" | "+r.getString(6));}return out;}
 
-  public void updateMaintenance(long staffId,long ticketId,String status,String notes,boolean readiness)throws SQLException { requireAuthenticated(staffId,"STAFF","MANAGER");require(Set.of("IN_PROGRESS","RESOLVED").contains(status),"Invalid maintenance status");if(status.equals("RESOLVED")&&(!readiness||norm(notes).isBlank()))throw new IllegalArgumentException("Resolution notes and readiness check are required");long station;String prior;try(var q=maintenanceRepository.updateMaintenance(ticketId)){try(var r=com.gamehub.infrastructure.QueryExecutor.query(q)){if(!r.next())throw new IllegalArgumentException("Ticket not found");station=r.getLong(1);prior=r.getString(2);}}if(("IN_PROGRESS".equals(status)&&!"REPORTED".equals(prior))||("RESOLVED".equals(status)&&!"IN_PROGRESS".equals(prior)))throw new IllegalStateException("Invalid maintenance transition");try(var p=maintenanceRepository.updateMaintenanceQuery2(status, notes, status.equals("RESOLVED")?now():null, ticketId)){com.gamehub.infrastructure.QueryExecutor.update(p);}if(status.equals("RESOLVED")){try(var u=stationRepository.updateMaintenance(station, station, station)){com.gamehub.infrastructure.QueryExecutor.update(u);}}audit(staffId,"MAINTENANCE",ticketId,status,notes);}
+  public void updateMaintenance(long staffId, long ticketId, String status, String notes, boolean readiness)
+      throws SQLException {
+    requireAuthenticated(staffId, "STAFF", "MANAGER");
+    require("IN_PROGRESS".equals(status) || "RESOLVED".equals(status), "Invalid maintenance status");
+    boolean resolve = "RESOLVED".equals(status);
+    if (resolve && (!readiness || norm(notes).isBlank())) {
+      throw new IllegalArgumentException("Resolution notes and readiness check are required");
+    }
+    transactions.begin();
+    try {
+      long station;
+      try (var statement = maintenanceRepository.updateMaintenance(ticketId); var row = statement.executeQuery()) {
+        if (!row.next()) throw new IllegalArgumentException("Ticket not found");
+        station = row.getLong(1);
+        String expected = resolve ? "IN_PROGRESS" : "REPORTED";
+        if (!expected.equals(row.getString(2))) throw new IllegalStateException("Invalid maintenance transition");
+      }
+      try (var statement = maintenanceRepository.updateMaintenanceQuery2(status, norm(notes), resolve ? now() : null, ticketId)) {
+        statement.executeUpdate();
+      }
+      if (resolve) {
+        try (var statement = stationRepository.updateMaintenance(station, station, station)) {
+          statement.executeUpdate();
+        }
+      }
+      audit(staffId, "MAINTENANCE", ticketId, status, norm(notes));
+      transactions.commit();
+    } catch (SQLException | RuntimeException failure) {
+      transactions.rollback();
+      throw failure;
+    } finally {
+      transactions.restoreAutoCommit();
+    }
+  }
 
   public List<String> stations() throws Exception {return new StationService(db).stationRecords();}
   public List<String> tickets() throws Exception {return maintenanceTickets();}

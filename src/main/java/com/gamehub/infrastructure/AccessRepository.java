@@ -33,7 +33,14 @@ public final class AccessRepository {
     }
 
     public PreparedStatement walkInCustomerRecords() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT u.id,COALESCE(c.full_name,u.username),u.username FROM users u LEFT JOIN customers c ON c.user_id=u.id WHERE u.role='CUSTOMER' AND u.active=1 ORDER BY 2");
+        PreparedStatement statement = connection.prepareStatement("""
+                SELECT u.id, COALESCE(c.full_name,u.username), u.username FROM users u
+                LEFT JOIN customers c ON c.user_id=u.id
+                WHERE u.role='CUSTOMER' AND u.active=1
+                  AND NOT EXISTS (SELECT 1 FROM sessions active
+                                  WHERE active.user_id=u.id AND active.status='ACTIVE')
+                ORDER BY 2
+                """);
         return statement;
     }
 

@@ -6,7 +6,7 @@ public final class ReservationRepository {
     private final Connection connection;
     public ReservationRepository(Connection connection) { this.connection=Objects.requireNonNull(connection); }
     public PreparedStatement deactivateStation(long value1, String value2) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM reservations WHERE station_id=? AND status='CONFIRMED' AND starts_at>?");
+        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM reservations WHERE station_id=? AND status='CONFIRMED' AND substr(replace(rtrim(starts_at, 'Z'), '.', '') || '000000000', 1, 28) > substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28)");
         try {
             statement.setLong(1, value1);
             statement.setString(2, value2);
@@ -18,7 +18,7 @@ public final class ReservationRepository {
     }
 
     public PreparedStatement reserve(long value1, long value2, String value3, String value4) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM reservations WHERE status IN ('CONFIRMED','IN_USE','COMPLETED') AND (station_id=? OR user_id=?) AND starts_at<? AND ends_at>?");
+        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM reservations WHERE status IN ('CONFIRMED','IN_USE','COMPLETED') AND (station_id=? OR user_id=?) AND substr(replace(rtrim(starts_at, 'Z'), '.', '') || '000000000', 1, 28) < substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28) AND substr(replace(rtrim(ends_at, 'Z'), '.', '') || '000000000', 1, 28) > substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28)");
         try {
             statement.setLong(1, value1);
             statement.setLong(2, value2);
@@ -47,12 +47,23 @@ public final class ReservationRepository {
     }
 
     public PreparedStatement eligibleReservationRecords() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT r.id,COALESCE(c.full_name,u.username),s.code,r.starts_at,r.ends_at FROM reservations r JOIN users u ON u.id=r.user_id LEFT JOIN customers c ON c.user_id=u.id JOIN gaming_stations s ON s.id=r.station_id WHERE r.status='CONFIRMED' ORDER BY r.starts_at");
+        PreparedStatement statement = connection.prepareStatement("""
+                SELECT r.id, COALESCE(c.full_name, u.username), s.code, r.starts_at, r.ends_at
+                FROM reservations r
+                JOIN users u ON u.id=r.user_id
+                LEFT JOIN customers c ON c.user_id=u.id
+                JOIN gaming_stations s ON s.id=r.station_id
+                WHERE r.status='CONFIRMED' AND s.active=1 AND s.status='AVAILABLE'
+                  AND u.active=1 AND u.role='CUSTOMER'
+                  AND NOT EXISTS (SELECT 1 FROM sessions active
+                                  WHERE active.user_id=r.user_id AND active.status='ACTIVE')
+                ORDER BY substr(replace(rtrim(r.starts_at, 'Z'), '.', '') || '000000000', 1, 28)
+                """);
         return statement;
     }
 
     public PreparedStatement startWalkInSession(long value1, String value2, String value3) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM reservations WHERE station_id=? AND status IN ('CONFIRMED','IN_USE') AND starts_at<? AND ends_at>?");
+        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM reservations WHERE station_id=? AND status IN ('CONFIRMED','IN_USE') AND substr(replace(rtrim(starts_at, 'Z'), '.', '') || '000000000', 1, 28) < substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28) AND substr(replace(rtrim(ends_at, 'Z'), '.', '') || '000000000', 1, 28) > substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28)");
         try {
             statement.setLong(1, value1);
             statement.setString(2, value2);
@@ -76,7 +87,7 @@ public final class ReservationRepository {
     }
 
     public PreparedStatement extendSessionQuery2(long value1, long value2, String value3, String value4) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM reservations WHERE station_id=? AND id<>? AND status IN ('CONFIRMED','IN_USE') AND starts_at<? AND ends_at>?");
+        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM reservations WHERE station_id=? AND id<>? AND status IN ('CONFIRMED','IN_USE') AND substr(replace(rtrim(starts_at, 'Z'), '.', '') || '000000000', 1, 28) < substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28) AND substr(replace(rtrim(ends_at, 'Z'), '.', '') || '000000000', 1, 28) > substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28)");
         try {
             statement.setLong(1, value1);
             statement.setLong(2, value2);
@@ -102,7 +113,7 @@ public final class ReservationRepository {
     }
 
     public PreparedStatement reservations(long value1) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT id,station_id,starts_at,ends_at,status FROM reservations WHERE user_id=? ORDER BY starts_at");
+        PreparedStatement statement = connection.prepareStatement("SELECT r.id,s.code,r.starts_at,r.ends_at,r.status FROM reservations r JOIN gaming_stations s ON s.id=r.station_id WHERE r.user_id=? ORDER BY substr(replace(rtrim(r.starts_at, 'Z'), '.', '') || '000000000', 1, 28) DESC");
         try {
             statement.setLong(1, value1);
             return statement;

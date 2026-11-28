@@ -38,6 +38,26 @@ public final class StationService extends ApplicationSupport {
 
   public List<String> availableStationRecords(Instant start,Instant end)throws SQLException {return stationRecords(start,end);}
 
+  public record StationDetails(long id, String code, String type, String specs, long rate) {}
+
+  public List<String> inventory() throws SQLException {
+    List<String> records = new ArrayList<>();
+    try (var statement = stationRepository.inventory(); var rows = statement.executeQuery()) {
+      while (rows.next()) {
+        records.add("#" + rows.getLong(1) + " | " + rows.getString(2) + " | " + rows.getString(3)
+            + " | " + rows.getString(6) + " | PKR " + java.math.BigDecimal.valueOf(rows.getLong(5), 2) + " / hour");
+      }
+    }
+    return records;
+  }
+
+  public StationDetails details(long id) throws SQLException {
+    try (var statement = stationRepository.stationDetails(id); var row = statement.executeQuery()) {
+      if (!row.next()) throw new IllegalArgumentException("Active station not found");
+      return new StationDetails(row.getLong(1), row.getString(2), row.getString(3), row.getString(4), row.getLong(5));
+    }
+  }
+
   public List<String> records() throws Exception {return stationRecords();}
   public long create(long a,String c,String t,String s,long r) throws Exception {return addStation(a,c,t,s,r);}
   public void update(long a,long id,String t,String s,long r) throws Exception {updateStation(a,id,t,s,r);}

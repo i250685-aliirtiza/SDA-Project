@@ -1,4 +1,15 @@
 # GameHub execution state
+
+## Local follow-up on 27 November 2026
+
+- The workspace is an extracted source tree. It has no Git metadata. The GitHub lookup failed during DNS resolution, so the branch and commit values below are historical.
+- JDK 21 started JavaFX against a separate database. Maven compiled production and test sources. `mvnw.cmd clean verify` could not resolve Surefire dependencies into its read-only default cache. The JUnit Jupiter engine ran 26 tests directly and all passed.
+- The deployed database had one user and zero stations. An isolated copy opened twice with matching row counts, both migration versions, and successful SQLite integrity and foreign-key checks.
+- Changes cover customer and front-desk list refresh, reservation search and timestamp precision, session billing rates, payment details and the match result workflow.
+- JavaFX control automation exercised all 12 use-case areas, including paid tournament entry, team rejection, reservation check-in, and restart. See `TEST_REPORT.md` for the covered scenarios and remaining verification.
+
+## Historical execution ledger
+
 Base SHA: fc237dfcd31f9c5b9759cb29daf43b1d0dae75d0
 Working branch: main
 Last verified commit: aaf94cc

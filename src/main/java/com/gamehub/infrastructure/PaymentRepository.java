@@ -118,7 +118,18 @@ public final class PaymentRepository {
     }
 
     public PreparedStatement outstandingCharges() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT c.id,u.username,c.amount_paisa,c.status FROM charges c JOIN users u ON u.id=c.user_id WHERE c.status IN ('UNPAID','PARTIALLY_PAID') ORDER BY c.id DESC");
+        PreparedStatement statement = connection.prepareStatement("""
+                SELECT c.id, u.username,
+                       c.amount_paisa - COALESCE((
+                           SELECT SUM(p.amount_paisa) FROM payments p
+                           WHERE p.charge_id=c.id AND p.status='SETTLED'
+                       ), 0) AS balance_paisa,
+                       c.status, customer.full_name, c.source_type, c.amount_paisa
+                FROM charges c JOIN users u ON u.id=c.user_id
+                LEFT JOIN customers customer ON customer.user_id=u.id
+                WHERE c.status IN ('UNPAID', 'PARTIALLY_PAID')
+                ORDER BY c.id DESC
+                """);
         return statement;
     }
 

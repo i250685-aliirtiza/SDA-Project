@@ -18,13 +18,28 @@ public final class MembershipRepository {
         }
     }
 
+    public PreparedStatement pendingCharge(long userId, long planId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT id FROM charges WHERE user_id=? AND source_type='MEMBERSHIP' AND source_id=? AND status IN ('UNPAID','PARTIALLY_PAID') ORDER BY id LIMIT 1");
+        statement.setLong(1, userId);
+        statement.setLong(2, planId);
+        return statement;
+    }
+
+    public PreparedStatement paidPlan(long chargeId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT c.user_id,p.name,p.duration_days FROM charges c JOIN membership_plans p ON p.id=c.source_id WHERE c.id=? AND c.source_type='MEMBERSHIP'");
+        statement.setLong(1, chargeId);
+        return statement;
+    }
+
     public PreparedStatement membershipPlans() throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT name,price_paisa,duration_days FROM membership_plans WHERE active=1 ORDER BY price_paisa");
         return statement;
     }
 
     public PreparedStatement subscribeOrRenew(String value1) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT id,price_paisa FROM membership_plans WHERE name=? AND active=1");
+        PreparedStatement statement = connection.prepareStatement("SELECT id,price_paisa,duration_days FROM membership_plans WHERE name=? AND active=1");
         try {
             statement.setString(1, value1);
             return statement;

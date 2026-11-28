@@ -16,15 +16,14 @@ public final class SessionRepository {
         }
     }
 
-    public PreparedStatement activeSessionRecords(String value1) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT s.id,COALESCE(c.full_name,u.username),g.code,s.started_at,CAST((julianday(?) - julianday(s.started_at))*86400 AS INTEGER),g.hourly_rate_paisa FROM sessions s JOIN users u ON u.id=s.user_id LEFT JOIN customers c ON c.user_id=u.id JOIN gaming_stations g ON g.id=s.station_id WHERE s.status='ACTIVE' ORDER BY s.started_at");
-        try {
-            statement.setString(1, value1);
-            return statement;
-        } catch (SQLException | RuntimeException failure) {
-            try { statement.close(); } catch (SQLException closeFailure) { failure.addSuppressed(closeFailure); }
-            throw failure;
-        }
+    public PreparedStatement activeSessionRecords() throws SQLException {
+        return connection.prepareStatement("""
+                SELECT s.id, COALESCE(c.full_name, u.username), g.code, s.started_at,
+                       s.hourly_rate_paisa, s.planned_end_at
+                FROM sessions s JOIN users u ON u.id=s.user_id
+                LEFT JOIN customers c ON c.user_id=u.id JOIN gaming_stations g ON g.id=s.station_id
+                WHERE s.status='ACTIVE' ORDER BY s.started_at
+                """);
     }
 
     public PreparedStatement startWalkInSession(long value1, long value2) throws SQLException {
@@ -40,12 +39,15 @@ public final class SessionRepository {
     }
 
     public PreparedStatement startWalkInSessionQuery2(long value1, long value2, String value3, String value4) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO sessions(user_id,station_id,started_at,planned_end_at,status) VALUES(?,?,?,?,'ACTIVE')", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement statement = connection.prepareStatement("""
+                INSERT INTO sessions(user_id, station_id, started_at, planned_end_at, status, hourly_rate_paisa)
+                SELECT ?, id, ?, ?, 'ACTIVE', hourly_rate_paisa FROM gaming_stations WHERE id=?
+                """, Statement.RETURN_GENERATED_KEYS);
         try {
             statement.setLong(1, value1);
-            statement.setLong(2, value2);
-            statement.setString(3, value3);
-            statement.setString(4, value4);
+            statement.setString(2, value3);
+            statement.setString(3, value4);
+            statement.setLong(4, value2);
             return statement;
         } catch (SQLException | RuntimeException failure) {
             try { statement.close(); } catch (SQLException closeFailure) { failure.addSuppressed(closeFailure); }
@@ -87,24 +89,18 @@ public final class SessionRepository {
         }
     }
 
-    public PreparedStatement startSession(long value1) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM sessions WHERE station_id=? AND status='ACTIVE'");
-        try {
-            statement.setLong(1, value1);
-            return statement;
-        } catch (SQLException | RuntimeException failure) {
-            try { statement.close(); } catch (SQLException closeFailure) { failure.addSuppressed(closeFailure); }
-            throw failure;
-        }
-    }
-
     public PreparedStatement startSessionQuery2(long value1, long value2, long value3, String value4) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO sessions(reservation_id,user_id,station_id,started_at,status) VALUES(?,?,?,?, 'ACTIVE')", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement statement = connection.prepareStatement("""
+                INSERT INTO sessions(reservation_id, user_id, station_id, started_at, planned_end_at, status, hourly_rate_paisa)
+                SELECT r.id, ?, g.id, ?, r.ends_at, 'ACTIVE', g.hourly_rate_paisa
+                FROM reservations r JOIN gaming_stations g ON g.id=r.station_id
+                WHERE r.id=? AND g.id=?
+                """, Statement.RETURN_GENERATED_KEYS);
         try {
-            statement.setLong(1, value1);
-            statement.setLong(2, value2);
-            statement.setLong(3, value3);
-            statement.setString(4, value4);
+            statement.setLong(1, value2);
+            statement.setString(2, value4);
+            statement.setLong(3, value1);
+            statement.setLong(4, value3);
             return statement;
         } catch (SQLException | RuntimeException failure) {
             try { statement.close(); } catch (SQLException closeFailure) { failure.addSuppressed(closeFailure); }
@@ -113,7 +109,7 @@ public final class SessionRepository {
     }
 
     public PreparedStatement finishSessionCalculated(long value1) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT s.started_at, g.hourly_rate_paisa FROM sessions s JOIN gaming_stations g ON g.id=s.station_id WHERE s.id=? AND s.status='ACTIVE'");
+        PreparedStatement statement = connection.prepareStatement("SELECT started_at, hourly_rate_paisa FROM sessions WHERE id=? AND status='ACTIVE'");
         try {
             statement.setLong(1, value1);
             return statement;

@@ -13,6 +13,64 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SessionDeskRegressionTest {
   @Test
+  void reservationCheckInWaitsForThePlayersExistingSessionToEnd() throws Exception {
+    Path path = Files.createTempFile("session-double-check-in-", ".db");
+    try (Database db = new Database(path)) {
+      var users = new UserService(db);
+      users.bootstrap("manager", "password1");
+      long manager = users.authenticate("manager", "password1").id();
+      long customer = users.registerCustomer("Desk Customer", "desk@example.com", "03001234567", "password2").id();
+      var stations = new com.gamehub.application.service.StationService(db);
+      var reservations = new com.gamehub.application.service.ReservationService(db);
+      var sessions = new com.gamehub.application.service.SessionService(db);
+      long walkInStation = stations.addStation(manager, "A-1", "PC", "", 60000);
+      long bookedStation = stations.addStation(manager, "A-2", "PC", "", 60000);
+      Instant start = Instant.now().plusSeconds(600);
+      long booking = reservations.reserve(customer, bookedStation, start, start.plusSeconds(3600));
+      long walkIn = sessions.startWalkInSession(manager, customer, walkInStation);
+
+      assertTrue(sessions.customers().isEmpty());
+      assertTrue(reservations.eligibleReservationRecords().isEmpty());
+      assertThrows(IllegalStateException.class, () -> sessions.startSession(manager, booking));
+      assertTrue(reservations.reservations(customer).getFirst().endsWith("[CONFIRMED]"));
+
+      sessions.finishSessionCalculated(manager, walkIn);
+      assertEquals(1, reservations.eligibleReservationRecords().size());
+      assertTrue(sessions.startSession(manager, booking) > 0);
+    } finally {
+      Files.deleteIfExists(path);
+    }
+  }
+
+  @Test
+  void aStationRateChangeDoesNotRepriceAnActiveSession() throws Exception {
+    Path path = Files.createTempFile("session-rate-", ".db");
+    try {
+      long managerId;
+      long sessionId;
+      try (Database db = new Database(path)) {
+        var users = new UserService(db);
+        users.bootstrap("manager", "password1");
+        managerId = users.authenticate("manager", "password1").id();
+        var customer = users.registerCustomer("Desk Customer", "rate@example.com", "03001234567", "password2");
+        var stations = new com.gamehub.application.service.StationService(db);
+        var sessions = new com.gamehub.application.service.SessionService(db);
+        long stationId = stations.addStation(managerId, "RATE-1", "PC", "", 60000);
+        sessionId = sessions.startWalkInSession(managerId, customer.id(), stationId, 60);
+        stations.updateStation(managerId, stationId, "PC", "", 120000);
+      }
+      try (Database db = new Database(path)) {
+        var sessions = new com.gamehub.application.service.SessionService(db);
+        assertTrue(sessions.activeSessionRecords().getFirst().contains("Est PKR 10.0"));
+        sessions.finishSessionCalculated(managerId, sessionId);
+        assertTrue(sessions.sessionBill(sessionId).contains("Bill PKR 10.0"));
+      }
+    } finally {
+      Files.deleteIfExists(path);
+    }
+  }
+
+  @Test
   void walkInConflictsAndExtensionsPreserveState() throws Exception {
     Path path=Files.createTempFile("session-desk-", ".db");
     try(Database db=new Database(path)) {

@@ -11,4 +11,4 @@
 9. Report and resolve maintenance from the station and ticket selectors. Refresh the manager report with a date range.
 10. Restart the application and verify reservations, receipts, membership, tournament and maintenance state persisted.
 
-Headless execution in this session did not provide visual click-through evidence.
+JavaFX control automation exercised these use-case areas. Use this script to rehearse the demo and check keyboard navigation, layout at different window sizes, and the remaining alternate flows.

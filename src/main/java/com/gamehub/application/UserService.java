@@ -23,9 +23,13 @@ public final class UserService {
   private final UserRepository users;
   public UserService(Database db){this.db=db;this.users=new UserRepository(db.connection());}
 
+  public boolean needsManagerSetup() throws SQLException {
+    return !users.hasManager();
+  }
+
   public void bootstrap(String username,String password)throws Exception {
     String login=normalizeLogin(username); validateCredentials(login,password); Connection c=db.connection(); c.setAutoCommit(false);
-    try { if(users.hasUsers()) throw new IllegalStateException("Manager setup is already complete"); long id=users.insertUser(login,hash(password),Role.MANAGER.name(),Instant.now().toString()); audit(null,id,"MANAGER","BOOTSTRAPPED","Initial manager account"); c.commit(); }
+    try { if(!needsManagerSetup()) throw new IllegalStateException("Manager setup is already complete"); if(users.usernameExists(login)) throw new IllegalArgumentException("That username is already registered"); long id=users.insertUser(login,hash(password),Role.MANAGER.name(),Instant.now().toString()); audit(null,id,"MANAGER","BOOTSTRAPPED","Initial manager account"); c.commit(); }
     catch(Exception e){c.rollback();throw e;} finally{c.setAutoCommit(true);}
   }
 

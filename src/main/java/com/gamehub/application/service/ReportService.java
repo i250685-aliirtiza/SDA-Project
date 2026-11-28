@@ -27,5 +27,10 @@ public final class ReportService extends ApplicationSupport {
 
   public Map<String,Long> counts() throws Exception {return reportCounts();}
   public Map<String,Long> summary(long a,Instant f,Instant t) throws Exception {return reportSummary(a,f,t);}
+  public Map<String, Long> summary(long actor, String category, Instant from, Instant to) throws SQLException {
+    requireAuthenticated(actor, "MANAGER");
+    return reports.summary(category, from, to);
+  }
+
   public void export(long a,String c,Instant f,Instant t,Path p) throws Exception {exportReportCsv(a,c,f,t,p);}
 }
