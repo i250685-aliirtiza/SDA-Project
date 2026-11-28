@@ -39,16 +39,40 @@ public final class MatchRepository {
     }
 
     public PreparedStatement scheduleMatchQuery2(long value1, String value2, long value3) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("UPDATE tournament_matches SET station_id=?,scheduled_at=? WHERE id=?");
+        PreparedStatement statement = connection.prepareStatement("UPDATE tournament_matches SET station_id=?,scheduled_at=?,duration_minutes=? WHERE id=?");
         try {
             statement.setLong(1, value1);
             statement.setString(2, value2);
-            statement.setLong(3, value3);
+            statement.setInt(3, 60);
+            statement.setLong(4, value3);
             return statement;
         } catch (SQLException | RuntimeException failure) {
             try { statement.close(); } catch (SQLException closeFailure) { failure.addSuppressed(closeFailure); }
             throw failure;
         }
+    }
+
+    public PreparedStatement scheduleConflict(long matchId, long stationId, String start, String end) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("""
+                SELECT 1 WHERE EXISTS (
+                  SELECT 1 FROM tournament_matches
+                  WHERE id<>? AND station_id=? AND scheduled_at IS NOT NULL
+                    AND status IN ('SCHEDULED','IN_PROGRESS')
+                    AND julianday(scheduled_at) < julianday(?) AND julianday(scheduled_at) + duration_minutes / 1440.0 > julianday(?)
+                ) OR EXISTS (
+                  SELECT 1 FROM reservations
+                  WHERE station_id=? AND status IN ('CONFIRMED','IN_USE')
+                    AND julianday(starts_at) < julianday(?) AND julianday(ends_at) > julianday(?)
+                ) OR EXISTS (
+                  SELECT 1 FROM sessions
+                  WHERE station_id=? AND status='ACTIVE'
+                )
+                """);
+        statement.setLong(1, matchId); statement.setLong(2, stationId);
+        statement.setString(3, end); statement.setString(4, start);
+        statement.setLong(5, stationId); statement.setString(6, end); statement.setString(7, start);
+        statement.setLong(8, stationId);
+        return statement;
     }
 
     public PreparedStatement correctMatchResult(long value1) throws SQLException {

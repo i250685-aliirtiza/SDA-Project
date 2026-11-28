@@ -114,6 +114,12 @@ public final class TournamentRepository {
         }
     }
 
+    public PreparedStatement cancelMatches(long tournamentId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE tournament_matches SET status='CANCELLED',station_id=NULL,scheduled_at=NULL WHERE tournament_id=? AND status IN ('SCHEDULED','IN_PROGRESS')");
+        statement.setLong(1, tournamentId);
+        return statement;
+    }
+
     public PreparedStatement registerTournament(long value1) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT fee_paisa,status,capacity,entrant_type,registration_open_at,registration_close_at FROM tournaments WHERE id=?");
         try {

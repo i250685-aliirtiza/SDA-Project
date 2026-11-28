@@ -9,9 +9,11 @@ import java.nio.file.Path;
 /** Focused application workflows for Team. */
 public final class TeamService extends ApplicationSupport {
     private final TeamRepository teamRepository;
+    private final TournamentRegistrationRepository registrationRepository;
     public TeamService(Database db) {
         super(db);
         this.teamRepository = new TeamRepository(db.connection());
+        this.registrationRepository = new TournamentRegistrationRepository(db.connection());
     }
   public long createTeam(long captainId,String name)throws SQLException {requireCustomer(captainId);require(!norm(name).isBlank(),"Team name is required");transactions.begin();try{try(var p=teamRepository.createTeam(norm(name), captainId, now())){com.gamehub.infrastructure.QueryExecutor.update(p);try(var k=com.gamehub.infrastructure.QueryExecutor.keys(p)){k.next();long id=k.getLong(1);try(var m=teamRepository.createTeamQuery2(id, captainId, now())){com.gamehub.infrastructure.QueryExecutor.update(m);}transactions.commit();return id;}}}catch(Exception e){transactions.rollback();if(e instanceof SQLException x)throw x;if(e instanceof RuntimeException x)throw x;throw new SQLException(e);}finally{transactions.restoreAutoCommit();}}
 
@@ -19,7 +21,7 @@ public final class TeamService extends ApplicationSupport {
       if (p.executeUpdate() != 1) throw new IllegalStateException("You are already a member or have a pending request.");
     }try(var p=teamRepository.requestJoinQuery3(teamId, userId)){com.gamehub.infrastructure.QueryExecutor.update(p);}transactions.commit();}catch(Exception e){transactions.rollback();if(e instanceof SQLException x)throw x;if(e instanceof RuntimeException x)throw x;throw new SQLException(e);}finally{transactions.restoreAutoCommit();}}
 
-  public void decideJoin(long captainId,long teamId,long userId,boolean approve)throws SQLException {try(var q=teamRepository.decideJoin(teamId)){try(var r=com.gamehub.infrastructure.QueryExecutor.query(q)){if(!r.next()||r.getLong(1)!=captainId)throw new SecurityException("Only the captain can decide join requests");}}transactions.begin();try {String st=approve?"ACCEPTED":"REJECTED";if(approve){try(var q=teamRepository.decideJoinQuery2(teamId)){try(var r=com.gamehub.infrastructure.QueryExecutor.query(q)){r.next();if(r.getInt(1)>=5)throw new IllegalStateException("Team is full");}}}try(var p=teamRepository.decideJoinQuery3(st, teamId, userId)){if(com.gamehub.infrastructure.QueryExecutor.update(p)!=1)throw new IllegalArgumentException("Pending request not found");}try(var p=teamRepository.decideJoinQuery4(st, captainId, now(), teamId, userId)){
+  public void decideJoin(long captainId,long teamId,long userId,boolean approve)throws SQLException {try(var q=teamRepository.decideJoin(teamId)){try(var r=com.gamehub.infrastructure.QueryExecutor.query(q)){if(!r.next()||r.getLong(1)!=captainId)throw new SecurityException("Only the captain can decide join requests");}}transactions.begin();try {String st=approve?"ACCEPTED":"REJECTED";if(approve){try(var lock=registrationRepository.registeredTeam(teamId);var locked=lock.executeQuery()){if(locked.next())throw new IllegalStateException("Team roster is locked while registered in a tournament");}try(var q=teamRepository.decideJoinQuery2(teamId)){try(var r=com.gamehub.infrastructure.QueryExecutor.query(q)){r.next();if(r.getInt(1)>=5)throw new IllegalStateException("Team is full");}}}try(var p=teamRepository.decideJoinQuery3(st, teamId, userId)){if(com.gamehub.infrastructure.QueryExecutor.update(p)!=1)throw new IllegalArgumentException("Pending request not found");}try(var p=teamRepository.decideJoinQuery4(st, captainId, now(), teamId, userId)){
       if (p.executeUpdate() != 1) throw new IllegalStateException("Pending request not found");
     }
     transactions.commit();

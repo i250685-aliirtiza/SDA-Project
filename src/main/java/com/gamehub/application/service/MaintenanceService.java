@@ -10,10 +10,12 @@ import java.nio.file.Path;
 public final class MaintenanceService extends ApplicationSupport {
     private final MaintenanceRepository maintenanceRepository;
     private final StationRepository stationRepository;
+    private final ReservationRepository reservationRepository;
     public MaintenanceService(Database db) {
         super(db);
         this.maintenanceRepository = new MaintenanceRepository(db.connection());
         this.stationRepository = new StationRepository(db.connection());
+        this.reservationRepository = new ReservationRepository(db.connection());
     }
   public long openMaintenance(long staffId, long stationId, String severity, String description) throws SQLException {
     requireAuthenticated(staffId, "STAFF", "MANAGER");
@@ -24,6 +26,9 @@ public final class MaintenanceService extends ApplicationSupport {
       try (var station = stationRepository.openMaintenance(stationId)) {
         if (station.executeUpdate() != 1) throw new IllegalArgumentException("Active station not found");
       }
+      try (var existing = maintenanceRepository.existingOpen(stationId, norm(description)); var rows = existing.executeQuery()) {
+        if (rows.next()) throw new IllegalStateException("An unresolved ticket already exists: #" + rows.getLong(1));
+      }
       long ticketId;
       try (var statement = maintenanceRepository.openMaintenance(stationId, norm(description), severity, now(), staffId)) {
         statement.executeUpdate();
@@ -32,6 +37,7 @@ public final class MaintenanceService extends ApplicationSupport {
           ticketId = keys.getLong(1);
         }
       }
+      try (var affected = reservationRepository.markAffected(stationId, now())) { affected.executeUpdate(); }
       audit(staffId, "MAINTENANCE", ticketId, "REPORTED", description);
       transactions.commit();
       return ticketId;
@@ -44,6 +50,12 @@ public final class MaintenanceService extends ApplicationSupport {
   }
 
   public List<String> maintenanceTickets() throws SQLException {List<String> out=new ArrayList<>();try(var s=maintenanceRepository.maintenanceTickets();var r=com.gamehub.infrastructure.QueryExecutor.query(s)){while(r.next())out.add("#"+r.getLong(1)+" | Station "+r.getString(3)+" | "+r.getString(4)+" | "+r.getString(5)+" | "+r.getString(6));}return out;}
+
+  public List<String> affectedReservations() throws SQLException {List<String> out=new ArrayList<>();try(var s=reservationRepository.affectedReservations();var r=s.executeQuery()){while(r.next())out.add("#"+r.getLong(1)+" | Customer #"+r.getLong(2)+" | Station "+r.getString(3)+" | "+r.getString(4)+" -> "+r.getString(5));}return out;}
+
+  public void cancelAffectedReservation(long staffId,long reservationId)throws SQLException {requireAuthenticated(staffId,"STAFF","MANAGER");try(var p=reservationRepository.cancelAffected(reservationId)){if(p.executeUpdate()!=1)throw new IllegalArgumentException("Affected reservation not found");}audit(staffId,"RESERVATION",reservationId,"CANCELLED_FOR_MAINTENANCE","Station outage");}
+
+  public void reassignAffectedReservation(long staffId,long reservationId,long stationId)throws SQLException {requireAuthenticated(staffId,"STAFF","MANAGER");transactions.begin();try{String starts,ends;try(var q=reservationRepository.affectedDetails(reservationId);var r=q.executeQuery()){if(!r.next())throw new IllegalArgumentException("Affected reservation not found");starts=r.getString(2);ends=r.getString(3);}try(var q=stationRepository.reserve(stationId);var r=q.executeQuery()){if(!r.next()||r.getInt(1)==0||!"AVAILABLE".equals(r.getString(2)))throw new IllegalStateException("Replacement station is unavailable");}try(var q=reservationRepository.reserve(stationId,0,ends,starts);var r=q.executeQuery()){r.next();if(r.getInt(1)>0)throw new IllegalStateException("Replacement station conflicts with another reservation");}try(var p=reservationRepository.reassignAffected(reservationId,stationId)){if(p.executeUpdate()!=1)throw new IllegalArgumentException("Affected reservation not found");}audit(staffId,"RESERVATION",reservationId,"REASSIGNED_FOR_MAINTENANCE","Replacement station "+stationId);transactions.commit();}catch(Exception e){transactions.rollback();if(e instanceof SQLException x)throw x;if(e instanceof RuntimeException x)throw x;throw new SQLException(e);}finally{transactions.restoreAutoCommit();}}
 
   public void updateMaintenance(long staffId, long ticketId, String status, String notes, boolean readiness)
       throws SQLException {

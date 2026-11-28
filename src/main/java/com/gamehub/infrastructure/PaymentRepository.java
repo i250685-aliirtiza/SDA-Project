@@ -144,6 +144,11 @@ public final class PaymentRepository {
         }
     }
 
+    public PreparedStatement receipts(long userId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT r.receipt_number,p.amount_paisa,p.method,r.issued_at FROM receipts r JOIN payments p ON p.id=r.payment_id WHERE p.user_id=? ORDER BY r.id DESC");
+        statement.setLong(1, userId); return statement;
+    }
+
     public PreparedStatement subscribeOrRenew(long value1, long value2, long value3, String value4) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("INSERT INTO charges(user_id,source_type,source_id,amount_paisa,status,created_at) VALUES(?,'MEMBERSHIP',?,? ,'UNPAID',?)", Statement.RETURN_GENERATED_KEYS);
         try {
@@ -184,6 +189,12 @@ public final class PaymentRepository {
             try { statement.close(); } catch (SQLException closeFailure) { failure.addSuppressed(closeFailure); }
             throw failure;
         }
+    }
+
+    public PreparedStatement cancelTournamentCharges(long tournamentId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE charges SET status='CANCELLED' WHERE source_type='TOURNAMENT' AND source_id IN (SELECT id FROM registrations WHERE tournament_id=?) AND status IN ('UNPAID','PARTIALLY_PAID')");
+        statement.setLong(1, tournamentId);
+        return statement;
     }
 
 }

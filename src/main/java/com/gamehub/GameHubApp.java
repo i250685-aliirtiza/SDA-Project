@@ -461,7 +461,7 @@ public final class GameHubApp extends Application {
                     : "No customers match this search.", "list-empty"));
         };
         Work refresh = () -> {
-            List<String> latest = accounts.customers();
+            List<String> latest = accounts.customers(current.id());
             customers.clear();
             customers.addAll(latest);
             applyFilter.run();
@@ -611,16 +611,22 @@ public final class GameHubApp extends Application {
             load(refreshSessions);
         });
         extend.disableProperty().bind(unselected(active));
-        Button finish = action("Finish session", "", () -> confirm("Finish this session?", "Finish session",
-                "Session finished. The charge is available under Payments.", () -> {
-                    long id = selectedId(active);
-                    sessions.finish(current.id(), id);
-                    load(() -> {
-                        bill.setText("Session #" + id + " · " + sessions.bill(id));
-                        bill.setVisible(true);
-                    });
-                    load(refreshSessions);
-                }));
+        Button finish = action("Finish session", "", () -> {
+            long id = selectedId(active);
+            CheckBox fault = new CheckBox("Report an equipment fault");
+            TextField description = field("Describe the fault");
+            formDialog("Finish session", "Finish session", () -> {
+                sessions.finish(current.id(), id);
+                if (fault.isSelected()) {
+                    maintenance.report(current.id(), sessions.sessionStation(id), "MEDIUM", description.getText());
+                }
+                load(() -> {
+                    bill.setText("Session #" + id + " · " + sessions.bill(id));
+                    bill.setVisible(true);
+                });
+                load(refreshSessions);
+            }, fault, formField("Fault description", description));
+        });
         finish.disableProperty().bind(unselected(active));
         VBox page = page(section("Active sessions", "Extend play time or finish a session to generate its charge.",
                         active, toolbar(formField("Extension in minutes", extension), extend, finish,
@@ -650,7 +656,9 @@ public final class GameHubApp extends Application {
 
     private Pane paymentPage() {
         ListView<String> rows = records("No outstanding charges.");
+        ListView<String> receipts = records("No receipts recorded for this account.");
         Work refresh = () -> fill(rows, payments::outstanding);
+        Work refreshReceipts = () -> fill(receipts, () -> payments.receipts(current.id()));
         TextField amount = field("0.00"), reference = field("Reference number");
         ComboBox<String> method = choices("CASH", "MANUAL_EXTERNAL");
         method.getSelectionModel().select("CASH");
@@ -664,6 +672,7 @@ public final class GameHubApp extends Application {
             amount.clear();
             reference.clear();
             load(refresh);
+            load(refreshReceipts);
         });
         settle.disableProperty().bind(unselected(rows));
         rows.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
@@ -676,6 +685,7 @@ public final class GameHubApp extends Application {
         });
         rows.setPrefHeight(319);
         load(refresh);
+        load(refreshReceipts);
         VBox ledger = section("Outstanding charges", "Choose the charge you want to settle.", rows,
                 toolbar(secondary("Refresh", "", refresh)));
         VBox checkout = section("Payment details", "Cash or externally processed payments.",
@@ -688,7 +698,8 @@ public final class GameHubApp extends Application {
         row.setAlignment(Pos.TOP_LEFT);
         ledger.setMinWidth(0);
         HBox.setHgrow(ledger, Priority.ALWAYS);
-        return page(row);
+        return page(row, section("Receipt history", "Previously issued receipts for the signed-in account.", receipts,
+                toolbar(secondary("Refresh", "", refreshReceipts))));
     }
 
     private Pane membershipPage() {
@@ -991,9 +1002,11 @@ public final class GameHubApp extends Application {
     private Pane maintenancePage() {
         ListView<String> equipment = records("No active stations.");
         ListView<String> tickets = records("No maintenance tickets.");
+        ListView<String> affected = records("No affected reservations.");
         Work refresh = () -> {
             fill(equipment, stations::inventory);
             fill(tickets, maintenance::tickets);
+            fill(affected, maintenance::affectedReservations);
         };
         Button report = action("Report issue", "", () -> {
             long station = selectedId(equipment);
@@ -1023,11 +1036,18 @@ public final class GameHubApp extends Application {
             }, formField("Resolution notes", notes), ready);
         });
         resolve.disableProperty().bind(notSelectedStatus(tickets, " | IN_PROGRESS | "));
+        Button cancelAffected = secondary("Cancel affected reservation", "Reservation cancelled.", () -> {
+            maintenance.cancelAffected(current.id(), selectedId(affected));
+            load(refresh);
+        });
+        cancelAffected.disableProperty().bind(unselected(affected));
         load(refresh);
         return page(section("Maintenance tickets", "Track equipment issues from report through readiness check.",
                         tickets, toolbar(progress, resolve, secondary("Refresh", "", refresh))),
                 section("Report an equipment issue", "Select a station to open a maintenance ticket.",
-                        equipment, toolbar(report)));
+                        equipment, toolbar(report)),
+                section("Affected reservations", "Review future bookings affected by an equipment outage.",
+                        affected, toolbar(cancelAffected)));
     }
 
     private Pane reportPage() {

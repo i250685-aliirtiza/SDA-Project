@@ -20,6 +20,11 @@ public final class MaintenanceRepository {
         }
     }
 
+    public PreparedStatement existingOpen(long stationId, String description) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT id FROM maintenance WHERE station_id=? AND status IN ('REPORTED','IN_PROGRESS') AND lower(trim(description))=lower(trim(?)) ORDER BY id DESC LIMIT 1");
+        statement.setLong(1, stationId); statement.setString(2, description); return statement;
+    }
+
     public PreparedStatement maintenanceTickets() throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT m.id,m.station_id,s.code,m.severity,m.status,m.description FROM maintenance m JOIN gaming_stations s ON s.id=m.station_id ORDER BY m.id DESC");
         return statement;

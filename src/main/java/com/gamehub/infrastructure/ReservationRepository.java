@@ -123,6 +123,30 @@ public final class ReservationRepository {
         }
     }
 
+    public PreparedStatement affectedReservations() throws SQLException {
+        return connection.prepareStatement("SELECT r.id,r.user_id,s.code,r.starts_at,r.ends_at FROM reservations r JOIN gaming_stations s ON s.id=r.station_id WHERE r.status='AFFECTED' ORDER BY r.starts_at");
+    }
+
+    public PreparedStatement markAffected(long stationId, String now) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE reservations SET status='AFFECTED' WHERE station_id=? AND status='CONFIRMED' AND starts_at>?");
+        statement.setLong(1, stationId); statement.setString(2, now); return statement;
+    }
+
+    public PreparedStatement affectedDetails(long reservationId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT station_id,starts_at,ends_at FROM reservations WHERE id=? AND status='AFFECTED'");
+        statement.setLong(1, reservationId); return statement;
+    }
+
+    public PreparedStatement reassignAffected(long reservationId, long stationId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE reservations SET station_id=?,status='CONFIRMED' WHERE id=? AND status='AFFECTED'");
+        statement.setLong(1, stationId); statement.setLong(2, reservationId); return statement;
+    }
+
+    public PreparedStatement cancelAffected(long reservationId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE reservations SET status='CANCELLED' WHERE id=? AND status='AFFECTED'");
+        statement.setLong(1, reservationId); return statement;
+    }
+
     public PreparedStatement cancelReservation(long value1, long value2, long value3) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("UPDATE reservations SET status='CANCELLED' WHERE id=? AND user_id=? AND status='CONFIRMED' AND NOT EXISTS (SELECT 1 FROM sessions WHERE reservation_id=? AND status='ACTIVE')");
         try {

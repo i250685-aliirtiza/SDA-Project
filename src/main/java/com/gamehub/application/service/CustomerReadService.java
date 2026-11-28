@@ -13,6 +13,6 @@ public final class CustomerReadService extends ApplicationSupport {
         super(db);
         this.accessRepository = new AccessRepository(db.connection());
     }
-  public List<String> customerRecords()throws SQLException {List<String> out=new ArrayList<>();try(var q=accessRepository.customerRecords();var r=com.gamehub.infrastructure.QueryExecutor.query(q)){while(r.next())out.add("#"+r.getLong(1)+" | "+r.getString(2)+" | "+r.getString(3)+" | "+r.getString(4)+" | "+(r.getInt(5)==1?"ACTIVE":"INACTIVE"));}return out;}
+  public List<String> customerRecords(long actor)throws SQLException {requireAuthenticated(actor,"STAFF","MANAGER");List<String> out=new ArrayList<>();try(var q=accessRepository.customerRecords();var r=com.gamehub.infrastructure.QueryExecutor.query(q)){while(r.next())out.add("#"+r.getLong(1)+" | "+r.getString(2)+" | "+r.getString(3)+" | "+r.getString(4)+" | "+(r.getInt(5)==1?"ACTIVE":"INACTIVE"));}return out;}
 
 }

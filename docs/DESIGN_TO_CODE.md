@@ -1,28 +1,14 @@
-# Design to code
+# Design to Code
 
-The application now has explicit application-layer controller counterparts under `com.gamehub.application.controller`. These are used as orchestration boundaries from the JavaFX shell for reservations, sessions and reports, and expose the corresponding validated operations for the other use cases.
+The closure branch preserves the presentation → application → infrastructure architecture.
 
-| D5 responsibility | Implementation |
-|---|---|
-| AccountController | `application/controller/AccountController` validates credentials and delegates account registration/authentication |
-| ReservationController | Uses `ReservationInterval` and delegates reservation ownership/cancellation |
-| SessionController | Delegates reserved and walk-in sessions, extension and completion |
-| PaymentController | Validates staff settlement input and delegates payment |
-| MembershipController | Validates plan selection and delegates catalog-backed membership |
-| TeamController | Delegates team creation, requests and captain decisions |
-| RegistrationController | Supports solo and team entrant registration |
-| TournamentController | Creates/configures drafts and enforces lifecycle orchestration |
-| MatchController | Generates, schedules, starts, records and corrects matches |
-| StationController | Creates, edits and deactivates stations |
-| MaintenanceController | Reports and transitions maintenance tickets |
-| ReportController | Performs authorized summaries and CSV export |
+- JavaFX `GameHubApp` routes through application controllers.
+- Focused services enforce business rules and transactions.
+- JDBC repositories own SQL and prepared statements.
+- `Database` owns migrations and connection setup.
+- `TransactionContext` owns commit, rollback, and auto-commit restoration.
+- `PricingPolicy` remains the strategy abstraction for billing.
 
-`ReservationInterval`, `ChargeBalance`, `PricingPolicy` and `StandardPricingPolicy` are meaningful domain/value objects. `ReportRepository` owns report SQL and `Database` owns migration/connection setup. `OperationsService` still contains legacy orchestration and SQL for several workflows, so the decomposition is incremental rather than complete repository extraction.
-JavaFX integration evidence
+Closure additions map to existing responsibilities. `MatchRepository.scheduleConflict` protects station allocation. `TournamentRepository.cancelMatches`, `TournamentRegistrationRepository.cancelForTournament`, and `PaymentRepository.cancelTournamentCharges` support transactional cancellation. `MaintenanceService` coordinates affected reservations. Receipt retrieval is owned by `PaymentRepository` and `PaymentService`. Registration and payment state changes use the shared audit repository.
 
-`GameHubApp` initializes all twelve controllers. Mutation and refresh handlers route through corresponding controller fields. The JavaFX shell contains no direct `OperationsService` calls.
-Application-service layer
-
-The controllers now depend on focused services under `com.gamehub.application.service`: `AccountService`, `ReservationService`, `SessionService`, `PaymentService`, `MembershipService`, `TeamService`, `TournamentRegistrationService`, `TournamentService`, `MatchService`, `StationService`, `MaintenanceService` and `ReportService`. `GameHubApp` composes those services into the twelve controllers.
-
-The focused services currently coordinate the verified `OperationsService` transaction implementation. This preserves existing transaction boundaries while making the D5 application boundary explicit. Full JDBC extraction from `OperationsService` remains the next infrastructure seam.
+The legacy `OperationsService` façade remains for compatibility. Sensitive report calls now require a manager actor. The branch does not introduce a new framework or replace SQLite or JavaFX.

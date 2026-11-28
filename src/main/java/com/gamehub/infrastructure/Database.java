@@ -61,6 +61,7 @@ public final class Database implements AutoCloseable {
    ensureColumn("sessions", "charge_id", "INTEGER");
    ensureColumn("payments", "charge_id", "INTEGER");
    ensureColumn("payments", "idempotency_key", "TEXT");
+   ensureColumn("tournament_matches", "duration_minutes", "INTEGER NOT NULL DEFAULT 60 CHECK(duration_minutes > 0)");
    ensureColumn("maintenance", "resolution_notes", "TEXT");
    ensureColumn("maintenance", "reported_by", "INTEGER");
    // Backfill columns introduced to sessions from their reservation.

@@ -166,6 +166,11 @@ public final class SessionRepository {
         }
     }
 
+    public PreparedStatement sessionStation(long sessionId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT station_id FROM sessions WHERE id=?");
+        statement.setLong(1, sessionId); return statement;
+    }
+
     public PreparedStatement settleSession(long value1) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT s.charge_paisa,s.status,s.user_id,s.charge_id FROM sessions s WHERE s.id=?");
         try {

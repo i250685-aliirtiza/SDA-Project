@@ -16,10 +16,12 @@ class ChainedAcceptanceTest {
   @Test
   void persistedDemoChainCoversCoreWorkflows() throws Exception {
     Path path = Files.createTempFile("gamehub-chain-", ".db");
+    long managerId;
     try (Database db = new Database(path)) {
       UserService users = new UserService(db);
       users.bootstrap("manager", "password1");
       var manager = users.authenticate("manager", "password1");
+      managerId = manager.id();
       var staff = users.provision("manager", "password1", "staff", "password2", Role.STAFF);
       var organizer = users.provision("manager", "password1", "organizer", "password3", Role.ORGANIZER);
       var alice = users.registerCustomer("Alice", "alice@example.com", "03001234567", "password4");
@@ -60,14 +62,12 @@ class ChainedAcceptanceTest {
     }
     try (Database reopened = new Database(path)) {
       OperationsService ops = new OperationsService(reopened);
-      assertTrue(ops.reportCount("users") >= 5);
-      assertTrue(ops.reportCount("payments") >= 2);
-      assertTrue(ops.reportCount("tournaments") >= 1);
+      assertTrue(ops.reportCount(managerId,"users") >= 5);
+      assertTrue(ops.reportCount(managerId,"payments") >= 2);
+      assertTrue(ops.reportCount(managerId,"tournaments") >= 1);
     } finally {
       Files.deleteIfExists(path);
     }
   }
 }
-
-
 

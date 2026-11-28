@@ -18,6 +18,11 @@ public final class TournamentRegistrationRepository {
         }
     }
 
+    public PreparedStatement registrationForCharge(long chargeId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT source_id FROM charges WHERE id=? AND source_type='TOURNAMENT'");
+        statement.setLong(1, chargeId); return statement;
+    }
+
     public PreparedStatement myRegistrations(long userId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "SELECT r.id,t.name,COALESCE(team.name,'Individual'),r.status,r.fee_paisa FROM registrations r "
@@ -126,6 +131,18 @@ public final class TournamentRegistrationRepository {
             try { statement.close(); } catch (SQLException closeFailure) { failure.addSuppressed(closeFailure); }
             throw failure;
         }
+    }
+
+    public PreparedStatement cancelForTournament(long tournamentId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE registrations SET status='CANCELLED' WHERE tournament_id=? AND status IN ('PENDING','CONFIRMED')");
+        statement.setLong(1, tournamentId);
+        return statement;
+    }
+
+    public PreparedStatement registeredTeam(long teamId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT 1 FROM registrations WHERE team_id=? AND status IN ('PENDING','CONFIRMED') LIMIT 1");
+        statement.setLong(1, teamId);
+        return statement;
     }
 
 }

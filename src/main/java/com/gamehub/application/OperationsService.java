@@ -42,7 +42,7 @@ public final class OperationsService {
     public long reserve(long userId,long stationId,Instant start,Instant end)throws SQLException{ return reservation.reserve(userId, stationId, start, end); }
     public List<String> eligibleReservationRecords()throws SQLException{ return reservation.eligibleReservationRecords(); }
     public List<String> activeSessionRecords()throws SQLException{ return session.activeSessionRecords(); }
-    public List<String> customerRecords()throws SQLException{ return customerRead.customerRecords(); }
+    public List<String> customerRecords(long actor) throws SQLException{ return customerRead.customerRecords(actor); }
     public List<String> walkInCustomerRecords()throws SQLException{ return session.walkInCustomerRecords(); }
     public List<String> availableStationRecords()throws SQLException{ return station.availableStationRecords(); }
     public List<String> availableStationRecords(Instant start,Instant end)throws SQLException{ return station.availableStationRecords(start, end); }
@@ -85,13 +85,14 @@ public final class OperationsService {
     public long openMaintenance(long staffId,long stationId,String severity,String description)throws SQLException{ return maintenance.openMaintenance(staffId, stationId, severity, description); }
     public List<String> maintenanceTickets() throws SQLException{ return maintenance.maintenanceTickets(); }
     public void updateMaintenance(long staffId,long ticketId,String status,String notes,boolean readiness)throws SQLException{ maintenance.updateMaintenance(staffId, ticketId, status, notes, readiness); }
-    public Map<String,Long> reportCounts()throws SQLException{ return report.reportCounts(); }
-    public long reportCount(String table)throws SQLException{ return report.reportCount(table); }
+    public Map<String,Long> reportCounts(long actor)throws SQLException{ return report.reportCounts(actor); }
+    public long reportCount(long actor,String table)throws SQLException{ return report.reportCount(actor,table); }
     public List<Long> generateMatches(long organizerId,long tournamentId)throws SQLException{ return match.generateMatches(organizerId, tournamentId); }
     public void startMatch(long organizerId,long matchId)throws SQLException{ match.startMatch(organizerId, matchId); }
     public void recordMatchResult(long organizerId,long matchId,int scoreA,int scoreB,long winner)throws SQLException{ match.recordMatchResult(organizerId, matchId, scoreA, scoreB, winner); }
     public List<String> standings(long tournamentId)throws SQLException{ return match.standings(tournamentId); }
     public void exportReportCsv(long actorId,String category,Instant from,Instant to,java.nio.file.Path target)throws SQLException,java.io.IOException{ report.exportReportCsv(actorId, category, from, to, target); }
     public Map<String,Long> reportSummary(long actorId,Instant from,Instant to)throws SQLException{ return report.reportSummary(actorId, from, to); }
-    public Map<String,Long> reportSummary(Instant from,Instant to)throws SQLException{ return report.reportSummary(from, to); }
+    public Map<String,Long> reportSummary(Instant from,Instant to)throws SQLException{ throw new SecurityException("Manager actor is required for reports"); }
 }
+
