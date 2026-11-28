@@ -32,7 +32,10 @@ public final class ReservationController {
         return service.mine(customer);
     }
 
+    public List<String> forCustomer(long actor, long customer) throws Exception { return service.reservationsFor(actor, customer); }
+
     public void cancel(long customer, long reservation) throws Exception {
         service.cancel(customer, reservation);
     }
 }
+

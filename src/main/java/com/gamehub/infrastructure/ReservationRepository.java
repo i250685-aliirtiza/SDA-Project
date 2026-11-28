@@ -18,12 +18,25 @@ public final class ReservationRepository {
     }
 
     public PreparedStatement reserve(long value1, long value2, String value3, String value4) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM reservations WHERE status IN ('CONFIRMED','IN_USE','COMPLETED') AND (station_id=? OR user_id=?) AND substr(replace(rtrim(starts_at, 'Z'), '.', '') || '000000000', 1, 28) < substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28) AND substr(replace(rtrim(ends_at, 'Z'), '.', '') || '000000000', 1, 28) > substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28)");
+        PreparedStatement statement = connection.prepareStatement("""
+                SELECT CASE WHEN EXISTS (SELECT 1 FROM reservations
+                  WHERE status IN ('CONFIRMED','IN_USE','COMPLETED') AND (station_id=? OR user_id=?)
+                    AND substr(replace(rtrim(starts_at, 'Z'), '.', '') || '000000000', 1, 28) < substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28)
+                    AND substr(replace(rtrim(ends_at, 'Z'), '.', '') || '000000000', 1, 28) > substr(replace(rtrim(?, 'Z'), '.', '') || '000000000', 1, 28))
+                   OR EXISTS (SELECT 1 FROM tournament_matches m
+                              WHERE m.station_id=? AND m.scheduled_at IS NOT NULL
+                                AND m.status IN ('SCHEDULED','IN_PROGRESS')
+                                AND julianday(m.scheduled_at) < julianday(?)
+                                AND julianday(m.scheduled_at) + m.duration_minutes / 1440.0 > julianday(?)) THEN 1 ELSE 0 END
+                """);
         try {
             statement.setLong(1, value1);
             statement.setLong(2, value2);
             statement.setString(3, value3);
             statement.setString(4, value4);
+            statement.setLong(5, value1);
+            statement.setString(6, value3);
+            statement.setString(7, value4);
             return statement;
         } catch (SQLException | RuntimeException failure) {
             try { statement.close(); } catch (SQLException closeFailure) { failure.addSuppressed(closeFailure); }
@@ -194,3 +207,4 @@ public final class ReservationRepository {
     }
 
 }
+

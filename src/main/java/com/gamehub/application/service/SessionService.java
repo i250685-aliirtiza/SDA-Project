@@ -13,6 +13,7 @@ public final class SessionService extends ApplicationSupport {
     private final ReservationRepository reservationRepository;
     private final SessionRepository sessionRepository;
     private final StationRepository stationRepository;
+    private final MaintenanceRepository maintenanceRepository;
     private final PricingPolicy pricingPolicy = new StandardPricingPolicy();
     public SessionService(Database db) {
         super(db);
@@ -21,6 +22,7 @@ public final class SessionService extends ApplicationSupport {
         this.reservationRepository = new ReservationRepository(db.connection());
         this.sessionRepository = new SessionRepository(db.connection());
         this.stationRepository = new StationRepository(db.connection());
+        this.maintenanceRepository = new MaintenanceRepository(db.connection());
     }
   public List<String> activeSessionRecords() throws SQLException {
     List<String> records = new ArrayList<>();
@@ -56,6 +58,27 @@ public final class SessionService extends ApplicationSupport {
 
   public long finishSession(long actorId,long sessionId,long charge)throws SQLException { requireAuthenticated(actorId,"STAFF","MANAGER"); return finishSessionWithCharge(sessionId,charge); }
 
+  public long finishSessionWithFault(long actorId,long sessionId,long charge,String severity,String description)throws SQLException {
+    requireAuthenticated(actorId,"STAFF","MANAGER");
+    require(Set.of("LOW","MEDIUM","HIGH","CRITICAL").contains(severity) && !norm(description).isBlank(), "Fault severity and description are required");
+    if(charge<=0){try(var q=sessionRepository.finishSessionCalculated(sessionId);var r=q.executeQuery()){if(!r.next())throw new IllegalArgumentException("Active session not found");charge=Math.max(1,pricingPolicy.calculate(r.getLong(2),Duration.between(Instant.parse(r.getString(1)),Instant.now())));}}
+    try(var active=sessionRepository.finishSessionWithCharge(sessionId);var row=active.executeQuery()){
+      if(!row.next()||!"ACTIVE".equals(row.getString(2)))throw new IllegalArgumentException("Active session not found");
+      long station=row.getLong(1); transactions.begin();
+      try {
+        String timestamp=now(); long user;
+        try(var q=sessionRepository.finishSessionWithChargeQuery2(sessionId);var r=q.executeQuery()){if(!r.next())throw new IllegalStateException("Session owner not found");user=r.getLong(1);}
+        long chargeId;
+        try(var p=paymentRepository.finishSessionWithCharge(user,"SESSION",sessionId,charge,timestamp)){p.executeUpdate();try(var keys=p.getGeneratedKeys()){if(!keys.next())throw new SQLException("Charge was not created");chargeId=keys.getLong(1);}}
+        try(var p=sessionRepository.finishSessionWithChargeQuery3(timestamp,charge,chargeId,sessionId)){if(p.executeUpdate()!=1)throw new IllegalStateException("Session has already ended");}
+        try(var p=reservationRepository.finishSessionWithCharge(sessionId)){p.executeUpdate();}
+        try(var p=maintenanceRepository.openMaintenance(station,norm(description),severity,timestamp,actorId)){p.executeUpdate();try(var keys=p.getGeneratedKeys()){if(!keys.next())throw new SQLException("Maintenance ticket was not created");audit(actorId,"MAINTENANCE",keys.getLong(1),"REPORTED_AT_SESSION_END",description);}}
+        try(var p=stationRepository.openMaintenance(station)){if(p.executeUpdate()!=1)throw new IllegalStateException("Station could not be placed into maintenance");}
+        transactions.commit(); return sessionId;
+      } catch(Exception e){transactions.rollback();if(e instanceof SQLException x)throw x;if(e instanceof RuntimeException x)throw x;throw new SQLException(e);} finally{transactions.restoreAutoCommit();}
+    }
+  }
+
   private long finishSessionWithCharge(long id,long charge)throws SQLException {require(charge>0,"Charge must be positive");try(var q=sessionRepository.finishSessionWithCharge(id)){try(var r=com.gamehub.infrastructure.QueryExecutor.query(q)){if(!r.next()||!"ACTIVE".equals(r.getString(2)))throw new IllegalArgumentException("Active session not found");long station=r.getLong(1);transactions.begin();try{String t=now();long user;try(var u=sessionRepository.finishSessionWithChargeQuery2(id)){try(var rr=com.gamehub.infrastructure.QueryExecutor.query(u)){rr.next();user=rr.getLong(1);}}long chargeId;try(var p=paymentRepository.finishSessionWithCharge(user, "SESSION", id, charge, t)){com.gamehub.infrastructure.QueryExecutor.update(p);try(var k=com.gamehub.infrastructure.QueryExecutor.keys(p)){k.next();chargeId=k.getLong(1);}}try(var p=sessionRepository.finishSessionWithChargeQuery3(t, charge, chargeId, id)){if(p.executeUpdate()!=1)throw new IllegalStateException("Session has already ended");}try(var u=reservationRepository.finishSessionWithCharge(id)){com.gamehub.infrastructure.QueryExecutor.update(u);}try(var p=stationRepository.finishSessionWithCharge(station, station)){com.gamehub.infrastructure.QueryExecutor.update(p);}transactions.commit();return id;}catch(Exception e){transactions.rollback();if(e instanceof SQLException x)throw x;if(e instanceof RuntimeException x)throw x;throw new SQLException(e);}finally{transactions.restoreAutoCommit();}}}}
 
   public long sessionChargeId(long sessionId)throws SQLException {try(var q=sessionRepository.sessionChargeId(sessionId)){try(var r=com.gamehub.infrastructure.QueryExecutor.query(q)){r.next();return r.getLong(1);}}}
@@ -77,3 +100,4 @@ public final class SessionService extends ApplicationSupport {
   public long finish(long a,long s) throws Exception {return finishSessionCalculated(a,s);}
   public String bill(long s) throws Exception {return sessionBill(s);}
 }
+

@@ -6,9 +6,9 @@
 - Branch: `gamehub-final-functional`
 - Verification command: `cmd /c mvnw.cmd clean verify`
 - Result: BUILD SUCCESS
-- Tests: 34 passed, 0 failed, 0 errors, 0 skipped
+- Tests: 36 passed, 0 failed, 0 errors, 0 skipped
 
-The four added closure tests cover match scheduling conflicts, tournament cancellation propagation, maintenance duplicate and affected reservations, and registration audit events. All tests use isolated temporary SQLite databases. Existing tests remain passing.
+The six added closure tests cover match scheduling conflicts, tournament cancellation propagation, maintenance duplicate and affected reservations, and registration audit events. All tests use isolated temporary SQLite databases. Existing tests remain passing.
 
 ## Database verification
 
@@ -17,3 +17,4 @@ The application was launched with an isolated `GAMEHUB_DB_PATH`. SQLite JDBC rep
 ## JavaFX verification
 
 `cmd /c mvnw.cmd javafx:run` reached the JavaFX run phase with the isolated database and no startup exception during observation. Manual control interaction and restart through the visible UI remain pending. No GUI test framework is present in the repository.
+

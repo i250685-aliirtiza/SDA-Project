@@ -616,10 +616,8 @@ public final class GameHubApp extends Application {
             CheckBox fault = new CheckBox("Report an equipment fault");
             TextField description = field("Describe the fault");
             formDialog("Finish session", "Finish session", () -> {
-                sessions.finish(current.id(), id);
-                if (fault.isSelected()) {
-                    maintenance.report(current.id(), sessions.sessionStation(id), "MEDIUM", description.getText());
-                }
+                if (fault.isSelected()) sessions.finishWithFault(current.id(), id, 0, "MEDIUM", description.getText());
+                else sessions.finish(current.id(), id);
                 load(() -> {
                     bill.setText("Session #" + id + " · " + sessions.bill(id));
                     bill.setVisible(true);
@@ -1003,10 +1001,13 @@ public final class GameHubApp extends Application {
         ListView<String> equipment = records("No active stations.");
         ListView<String> tickets = records("No maintenance tickets.");
         ListView<String> affected = records("No affected reservations.");
+        ComboBox<String> replacement = choices();
+        replacement.setPromptText("Replacement station");
         Work refresh = () -> {
             fill(equipment, stations::inventory);
             fill(tickets, maintenance::tickets);
             fill(affected, maintenance::affectedReservations);
+            replacement.getItems().setAll(stations.records());
         };
         Button report = action("Report issue", "", () -> {
             long station = selectedId(equipment);
@@ -1041,13 +1042,19 @@ public final class GameHubApp extends Application {
             load(refresh);
         });
         cancelAffected.disableProperty().bind(unselected(affected));
+        Button reassignAffected = action("Reassign affected reservation", "Reservation reassigned.", () -> {
+            maintenance.reassignAffected(current.id(), selectedId(affected), id(replacement.getValue()));
+            replacement.getSelectionModel().clearSelection();
+            load(refresh);
+        });
+        reassignAffected.disableProperty().bind(unselected(affected).or(replacement.valueProperty().isNull()));
         load(refresh);
         return page(section("Maintenance tickets", "Track equipment issues from report through readiness check.",
                         tickets, toolbar(progress, resolve, secondary("Refresh", "", refresh))),
                 section("Report an equipment issue", "Select a station to open a maintenance ticket.",
                         equipment, toolbar(report)),
                 section("Affected reservations", "Review future bookings affected by an equipment outage.",
-                        affected, toolbar(cancelAffected)));
+                        affected, toolbar(formField("Replacement station", replacement), reassignAffected, cancelAffected)));
     }
 
     private Pane reportPage() {
@@ -1468,3 +1475,4 @@ public final class GameHubApp extends Application {
         launch(args);
     }
 }
+

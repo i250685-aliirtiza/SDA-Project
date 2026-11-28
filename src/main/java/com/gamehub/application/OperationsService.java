@@ -51,6 +51,7 @@ public final class OperationsService {
     public String sessionBill(long sessionId)throws SQLException{ return session.sessionBill(sessionId); }
     public void extendSession(long staffId,long sessionId,int minutes)throws SQLException{ session.extendSession(staffId, sessionId, minutes); }
     public List<String> reservations(long userId)throws SQLException{ return reservation.reservations(userId); }
+    public List<String> reservationsFor(long actor,long customer)throws SQLException{ return reservation.reservationsFor(actor,customer); }
     public void cancelReservation(long userId,long id)throws SQLException{ reservation.cancelReservation(userId, id); }
     public long startSession(long staffId,long reservationId)throws SQLException{ return session.startSession(staffId, reservationId); }
     public long finishSessionCalculated(long actorId,long sessionId)throws SQLException{ return session.finishSessionCalculated(actorId, sessionId); }

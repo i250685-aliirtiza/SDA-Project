@@ -10,7 +10,7 @@ Functional implementation commit: `ebedd08ee81c63fde8145a0155a2ab5637988eeb`
 
 Documentation tip after closure report update: see the final branch commit reported with the verification result.
 
-The closure branch implements the primary audited defects and adds regression coverage. The Maven verification suite passes with 34 tests. Four new tests cover match allocation conflicts, tournament cancellation propagation, maintenance duplicate and affected reservations, and registration auditing.
+The closure branch implements the primary audited defects and adds regression coverage. The Maven verification suite passes with 36 tests. Six new tests cover match allocation conflicts, tournament cancellation propagation, maintenance duplicate and affected reservations, and registration auditing.
 
 The JavaFX application starts through `mvnw.cmd javafx:run` with an isolated database and remains running without a startup exception. The process was stopped manually after launch observation. No reproducible JavaFX click automation or TestFX suite is present, so GUI interaction evidence remains pending.
 
@@ -23,7 +23,7 @@ The JavaFX application starts through `mvnw.cmd javafx:run` with an isolated dat
 | F01 Match scheduling conflicts | Added `duration_minutes` to match persistence and transactional checks against other scheduled matches, reservations, and active sessions. Conflicting assignments return an explanatory error. | `V1__init.sql`, `Database`, `MatchRepository.scheduleConflict`, `MatchService.scheduleMatch` | `FunctionalClosureRegressionTest.matchSchedulingRejectsTheSameStationAndTime` |
 | F02 Tournament cancellation | Cancellation now runs in one transaction. It cancels pending and confirmed registrations, cancels pending tournament charges, cancels scheduled or in-progress matches, clears their station allocation, and writes an audit event. Paid payment rows remain historical. | `TournamentService.changeTournamentStatus`, `TournamentRegistrationRepository.cancelForTournament`, `PaymentRepository.cancelTournamentCharges`, `TournamentRepository.cancelMatches` | `FunctionalClosureRegressionTest.tournamentCancellationCancelsRegistrationsAndPendingCharges` |
 | F03 Duplicate maintenance faults | An unresolved ticket with the same station and normalized description is rejected with the existing ticket number. Distinct descriptions remain valid. | `MaintenanceRepository.existingOpen`, `MaintenanceService.openMaintenance` | `FunctionalClosureRegressionTest.maintenanceReportsAffectedReservationsAndRejectsDuplicateFaults` |
-| F04 Affected reservations | Future confirmed reservations on a station reported for maintenance are marked `AFFECTED`. Staff can view them and cancel them from the Maintenance screen. A service-level reassignment path validates replacement availability and conflicts. | `ReservationRepository.markAffected`, `affectedReservations`, `cancelAffected`, `reassignAffected`, `MaintenanceService`, `MaintenanceController`, `GameHubApp.maintenancePage` | `FunctionalClosureRegressionTest.maintenanceReportsAffectedReservationsAndRejectsDuplicateFaults` |
+| F04 Affected reservations | Future confirmed reservations on a station reported for maintenance are marked `AFFECTED`. Staff can view them and cancel them from the Maintenance screen. The Maintenance screen now exposes replacement-station selection and reassignment, and the service validates replacement availability and conflicts. | `ReservationRepository.markAffected`, `affectedReservations`, `cancelAffected`, `reassignAffected`, `MaintenanceService`, `MaintenanceController`, `GameHubApp.maintenancePage` | `FunctionalClosureRegressionTest.maintenanceReportsAffectedReservationsAndRejectsDuplicateFaults` |
 | F05 Registration auditing | Individual and team registration creation write actor, entity, operation, and timestamp audit rows. Full-payment confirmation writes a registration payment-confirmed audit row. | `TournamentRegistrationService`, `PaymentService`, `TournamentRegistrationRepository.registrationForCharge` | `FunctionalClosureRegressionTest.registrationAndPaymentCreateAuditEvents` |
 | F06 Match result correction | Existing correction authorization, score validation, revision increment, audit event, and dependent-round safety guard remain enforced. A winner change is rejected after a later bracket round exists instead of silently corrupting the bracket. | `MatchService.correctMatchResult`, `MatchRepository.correctMatchResultQuery2`, `AuditRepository` | Existing match correction regression paths plus full suite |
 | F07 Read authorization | Customer directory reads require staff or manager identity. Customer reservation reads validate the supplied customer account. Report counts, report summaries, and report exports require a manager actor. Actorless report summary calls now fail. | `CustomerReadService`, `AccountService`, `AccountController`, `ReservationService`, `ReportService`, `OperationsService`, `ReportController` | Existing authorization tests plus updated report callers |
@@ -78,7 +78,7 @@ No production or personal database was used for destructive testing.
 
 ## 6. GUI verification evidence
 
-Source-level UI wiring was updated for affected reservations, session-end fault reporting, and receipt history. Controllers route to services and repositories. Error text from service exceptions reaches the shared JavaFX feedback handler.
+Source-level UI wiring was updated for affected-reservation reassignment, session-end fault reporting, receipt history, and atomic fault completion. Controllers route to services and repositories. Error text from service exceptions reaches the shared JavaFX feedback handler.
 
 Manual click-through remains pending for authentication, role navigation, every screen, all alternative flows, receipt retrieval, cancellation propagation, reassignment, and restart through the visible UI. The launch test proves process startup and database initialization only. It does not certify GUI interaction.
 
@@ -129,7 +129,7 @@ The estimate below is not an instructor grade. Automated functional evidence imp
 ## 10. Outstanding limitations
 
 - GUI interactions, visible error feedback, resize behavior, and restart through the UI still require manual or TestFX verification.
-- Maintenance reassignment is available through the application service. The visible UI currently exposes the cancellation follow-up path.
+- Maintenance reassignment is available through the visible Maintenance screen and service layer.
 - The existing application still contains a legacy `OperationsService` façade for compatibility. Sensitive report calls were made actor-aware, while broader operational read methods should be included in a future authorization sweep if the instructor requires every read façade to carry an actor identity.
 - Match duration is represented with a one-hour default because the original model did not define a separate match-duration field. The decision is documented by the migration and schedule conflict implementation.
 
@@ -142,4 +142,15 @@ The branch remains ready for a CSS-only visual enhancement after GUI verificatio
 **IMPLEMENTED — GUI VERIFICATION PENDING**
 
 
+
+
+## Final acceptance pass update
+
+- Test count increased to 36 passed, 0 failed, 0 errors, 0 skipped.
+- Affected reservations now expose a replacement-station combo box and a reassignment action on the Maintenance screen.
+- Reservation creation now rejects intervals overlapping scheduled tournament matches, including when the match allocation was created first. Match scheduling already rejects overlapping reservations and active sessions.
+- Session fault completion now uses one transaction for charge creation, session closure, maintenance creation, station state, and audit. A failure rolls back the complete operation.
+- Customer reservation reads now have an explicit actor-target API that rejects cross-customer access.
+- Tournament cancellation writes registration-level cancellation audit events in addition to tournament-level lifecycle audit.
+- Exact GUI interaction remains unavailable in this environment. The manual acceptance procedure is recorded in `docs/MANUAL_ACCEPTANCE_SCRIPT.md`.
 

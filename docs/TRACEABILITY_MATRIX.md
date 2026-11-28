@@ -16,3 +16,7 @@
 | UC-12 | `ReportController`, `ReportService` | Source transaction tables | Report export and authorization tests |
 
 GUI interaction remains pending and is tracked in the closure report.
+
+
+Final pass additions include UI reassignment, bidirectional station allocation checks, atomic session fault completion, cross-customer reservation authorization, and registration cancellation audit events. Manual GUI evidence is pending and is specified in docs/MANUAL_ACCEPTANCE_SCRIPT.md.
+

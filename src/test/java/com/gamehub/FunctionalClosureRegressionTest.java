@@ -33,6 +33,7 @@ class FunctionalClosureRegressionTest {
             Instant when = Instant.now().plusSeconds(7200);
             matches.scheduleMatch(manager.id(), generated.get(0), station, when);
             assertThrows(IllegalStateException.class, () -> matches.scheduleMatch(manager.id(), generated.get(1), station, when));
+            assertThrows(IllegalStateException.class, () -> new ReservationService(db).reserve(customers.get(0).id(), station, when, when.plusSeconds(3600)));
         } finally { Files.deleteIfExists(path); }
     }
 
@@ -93,6 +94,38 @@ class FunctionalClosureRegressionTest {
             try (var rows = db.connection().createStatement().executeQuery("SELECT COUNT(*) FROM audit_events WHERE entity_type='REGISTRATION' AND operation='CREATED'")) {
                 assertTrue(rows.next()); assertEquals(1, rows.getInt(1));
             }
+        } finally { Files.deleteIfExists(path); }
+    }
+
+    @Test
+    void customerCannotReadAnotherCustomerReservations() throws Exception {
+        Path path = Files.createTempFile("reservation-auth-", ".db");
+        try (Database db = new Database(path)) {
+            UserService users = new UserService(db);
+            users.bootstrap("manager", "password1");
+            var first = users.registerCustomer("First", "first-auth@example.com", "03001234004", "password2");
+            var second = users.registerCustomer("Second", "second-auth@example.com", "03001234005", "password2");
+            assertThrows(SecurityException.class, () -> new ReservationService(db).reservationsFor(first.id(), second.id()));
+        } finally { Files.deleteIfExists(path); }
+    }
+
+    @Test
+    void finishingWithFaultKeepsStationUnavailableAndCreatesTicketTogether() throws Exception {
+        Path path = Files.createTempFile("session-fault-", ".db");
+        try (Database db = new Database(path)) {
+            UserService users = new UserService(db);
+            users.bootstrap("manager", "password1");
+            var manager = users.authenticate("manager", "password1");
+            var customer = users.registerCustomer("Player", "fault@example.com", "03001234006", "password2");
+            long station = new StationService(db).addStation(manager.id(), "FAULT-01", "PC", "", 50000);
+            long reservation = new ReservationService(db).reserve(customer.id(), station, Instant.now().plusSeconds(3600), Instant.now().plusSeconds(7200));
+            long session = new SessionService(db).startSession(manager.id(), reservation);
+            new SessionService(db).finishSessionWithFault(manager.id(), session, 5000, "HIGH", "Fan failure");
+            try (var row = db.connection().prepareStatement("SELECT status FROM gaming_stations WHERE id=?")) {
+                row.setLong(1, station);
+                try (var result = row.executeQuery()) { assertTrue(result.next()); assertEquals("MAINTENANCE", result.getString(1)); }
+            }
+            assertEquals(1, new MaintenanceService(db).maintenanceTickets().size());
         } finally { Files.deleteIfExists(path); }
     }
 }

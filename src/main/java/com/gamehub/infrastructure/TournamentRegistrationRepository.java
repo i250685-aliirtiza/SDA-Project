@@ -139,6 +139,11 @@ public final class TournamentRegistrationRepository {
         return statement;
     }
 
+    public PreparedStatement registrationIds(long tournamentId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT id FROM registrations WHERE tournament_id=? AND status IN ('PENDING','CONFIRMED')");
+        statement.setLong(1, tournamentId); return statement;
+    }
+
     public PreparedStatement registeredTeam(long teamId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT 1 FROM registrations WHERE team_id=? AND status IN ('PENDING','CONFIRMED') LIMIT 1");
         statement.setLong(1, teamId);
@@ -146,3 +151,4 @@ public final class TournamentRegistrationRepository {
     }
 
 }
+

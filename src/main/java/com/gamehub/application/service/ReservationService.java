@@ -26,6 +26,7 @@ public final class ReservationService extends ApplicationSupport {
   }}}return out;}
 
   public List<String> reservations(long userId)throws SQLException {requireCustomer(userId);List<String> out=new ArrayList<>();try(var p=reservationRepository.reservations(userId)){try(var r=com.gamehub.infrastructure.QueryExecutor.query(p)){while(r.next())out.add("#"+r.getLong(1)+" | "+r.getString(2)+" | "+r.getString(3)+" -> "+r.getString(4)+" | ["+r.getString(5)+"]");}}return out;}
+  public List<String> reservationsFor(long actor,long customer)throws SQLException {requireAuthenticated(actor,"CUSTOMER","STAFF","MANAGER");if(actor!=customer){try(var q=new AccessRepository(db.connection()).requireRole(actor);var r=q.executeQuery()){if(!r.next()||!Set.of("STAFF","MANAGER").contains(r.getString(1)))throw new SecurityException("Cannot read another customer's reservations");}}return reservations(customer);}
 
   public void cancelReservation(long userId,long id)throws SQLException {try(var p=reservationRepository.cancelReservation(id, userId, id)){if(com.gamehub.infrastructure.QueryExecutor.update(p)!=1)throw new IllegalArgumentException("Reservation not found or already cancelled");}}
 
@@ -45,3 +46,4 @@ public final class ReservationService extends ApplicationSupport {
   }
   public List<String> mine(long c) throws Exception {return reservations(c);}
 }
+
