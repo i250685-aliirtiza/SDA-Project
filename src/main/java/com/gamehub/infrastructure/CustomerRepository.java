@@ -1,0 +1,3 @@
+package com.gamehub.infrastructure;
+import java.sql.*;import java.util.*;
+public final class CustomerRepository { private final Connection connection; public CustomerRepository(Connection connection){this.connection=Objects.requireNonNull(connection);} public List<String> records()throws SQLException{List<String> out=new ArrayList<>();try(var q=connection.createStatement();var r=q.executeQuery("SELECT u.id,COALESCE(c.full_name,u.username),COALESCE(c.email,u.username),COALESCE(c.phone,''),u.active FROM users u LEFT JOIN customers c ON c.user_id=u.id WHERE u.role='CUSTOMER' ORDER BY 2")){while(r.next())out.add("#"+r.getLong(1)+" | "+r.getString(2)+" | "+r.getString(3)+" | "+r.getString(4)+" | "+(r.getInt(5)==1?"ACTIVE":"INACTIVE"));}return out;}}

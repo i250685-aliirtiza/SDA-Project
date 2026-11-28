@@ -1,0 +1,15 @@
+*.class
+*.db
+*.db-shm
+*.db-wal
+target/
+.idea/
+.vscode/
+*.iml
+.env
+.env.*
+*.key
+*.pem
+*.p12
+credentials*.json
+secrets*.json
